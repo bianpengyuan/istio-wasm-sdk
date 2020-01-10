@@ -21,18 +21,16 @@ cc_library(
     name = "context",
     srcs = [
         "context.cc",
+        "request_info.cc",
         "util.cc",
     ],
     hdrs = [
         "context.h",
+        "request_info.h",
         "util.h",
     ],
-    # additional_linker_inputs = ["@envoy_wasm_api//:jslib"],
-    # linkopts = [
-    #     "--js-library",
-    #     "external/envoy_wasm_api/proxy_wasm_intrinsics.js",
-    # ],
     deps = [
+        ":request_info_cc_proto",
         ":node_info_cc_proto",
         "@com_google_protobuf//:protobuf",
         "@envoy_wasm_api//:proxy_wasm_intrinsics",
@@ -48,11 +46,6 @@ cc_library(
     hdrs = [
         "node_info_cache.h",
     ],
-    # additional_linker_inputs = ["@envoy_wasm_api//:jslib"],
-    # linkopts = [
-    #     "--js-library",
-    #     "external/envoy_wasm_api/proxy_wasm_intrinsics.js",
-    # ],
     deps = [
         ":context",
         "@envoy_wasm_api//:proxy_wasm_intrinsics",
@@ -68,6 +61,20 @@ cc_proto_library(
 proto_library(
     name = "node_info_proto",
     srcs = ["node_info.proto"],
+)
+
+cc_proto_library(
+    name = "request_info_cc_proto",
+    visibility = ["//visibility:private"],
+    deps = ["request_info_proto"],
+)
+
+proto_library(
+    name = "request_info_proto",
+    srcs = ["request_info.proto"],
+    deps = [
+        "@com_google_protobuf//:wrappers_proto",
+    ],
 )
 
 # cc_test(

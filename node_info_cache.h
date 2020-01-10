@@ -16,7 +16,7 @@
 #include <unordered_map>
 
 #include "absl/strings/string_view.h"
-#include "extensions/common/node_info.pb.h"
+#include "node_info.pb.h"
 #include "proxy_wasm_intrinsics.h"
 
 namespace Wasm {

@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "extensions/common/node_info_cache.h"
+#include "node_info_cache.h"
 
 #include "absl/strings/str_cat.h"
-#include "extensions/common/context.h"
+#include "context.h"
 #include "google/protobuf/util/json_util.h"
 
 using google::protobuf::util::Status;
