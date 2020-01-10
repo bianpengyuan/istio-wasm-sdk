@@ -33,7 +33,7 @@ def sdk_dependencies():
     new_git_repository(
         name = "envoy_wasm_api",
         remote = "https://github.com/envoyproxy/envoy-wasm",
-        commit = "9cf22b854ed48b8d62bf480c6a2730fa958740de",
+        commit = "456bf9aef22d7b4df4916fa49c5dad2f5dbf0f0f",
         workspace_file_content = 'workspace(name = "envoy_wasm_api")',
         strip_prefix = "api/wasm/cpp",
         patch_cmds = ["rm BUILD"],
@@ -48,4 +48,17 @@ def sdk_dependencies():
             "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
             "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
         ],
+    )
+
+    # http_archive(
+    #     name = "com_google_absl",
+    #     sha256 = "3df5970908ed9a09ba51388d04661803a6af18c373866f442cede7f381e0b94a",
+    #     strip_prefix = "abseil-cpp-14550beb3b7b97195e483fb74b5efb906395c31e",
+    #     # 2019-07-31
+    #     urls = ["https://github.com/abseil/abseil-cpp/archive/14550beb3b7b97195e483fb74b5efb906395c31e.tar.gz"],
+    # )
+
+    native.local_repository(
+        name="com_google_absl", 
+        path="/usr/local/google/home/bianpengyuan/abseil-cpp",
     )
