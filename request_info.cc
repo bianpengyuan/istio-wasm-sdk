@@ -16,8 +16,6 @@
 #include "request_info.h"
 
 #include "util.h"
-
-#include "absl/strings/str_split.h"
 #include "proxy_wasm_intrinsics.h"
 
 namespace Wasm {
@@ -84,28 +82,28 @@ void extractServiceName(const std::string& host,
 void getDestinationService(const std::string& dest_namespace,
                            bool use_host_header, std::string* dest_svc_host,
                            std::string* dest_svc_name) {
-  std::string cluster_name;
-  getValue({"cluster_name"}, &cluster_name);
-  *dest_svc_host = use_host_header
-                       ? getHeaderMapValue(HeaderMapType::RequestHeaders,
-                                           kAuthorityHeaderKey)
-                             ->toString()
-                       : "unknown";
+  // std::string cluster_name;
+  // getValue({"cluster_name"}, &cluster_name);
+  // *dest_svc_host = use_host_header
+  //                      ? getHeaderMapValue(HeaderMapType::RequestHeaders,
+  //                                          kAuthorityHeaderKey)
+  //                            ->toString()
+  //                      : "unknown";
 
-  if (cluster_name == kBlackHoleCluster ||
-      cluster_name == kPassThroughCluster ||
-      cluster_name == kInboundPassthroughClusterIpv4 ||
-      cluster_name == kInboundPassthroughClusterIpv6) {
-    *dest_svc_name = cluster_name;
-    return;
-  }
+  // if (cluster_name == kBlackHoleCluster ||
+  //     cluster_name == kPassThroughCluster ||
+  //     cluster_name == kInboundPassthroughClusterIpv4 ||
+  //     cluster_name == kInboundPassthroughClusterIpv6) {
+  //   *dest_svc_name = cluster_name;
+  //   return;
+  // }
 
-  std::vector<absl::string_view> parts = absl::StrSplit(cluster_name, '|');
-  if (parts.size() == 4) {
-    *dest_svc_host = std::string(parts[3].data(), parts[3].size());
-  }
+  // std::vector<absl::string_view> parts = absl::StrSplit(cluster_name, '|');
+  // if (parts.size() == 4) {
+  //   *dest_svc_host = std::string(parts[3].data(), parts[3].size());
+  // }
 
-  extractServiceName(*dest_svc_host, dest_namespace, dest_svc_name);
+  // extractServiceName(*dest_svc_host, dest_namespace, dest_svc_name);
 }
 
 }  // namespace

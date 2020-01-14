@@ -15,8 +15,6 @@
 
 #include "context.h"
 
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_split.h"
 #include "util.h"
 #include "google/protobuf/util/json_util.h"
 
@@ -83,28 +81,28 @@ void extractServiceName(const std::string& host,
 void getDestinationService(const std::string& dest_namespace,
                            bool use_host_header, std::string* dest_svc_host,
                            std::string* dest_svc_name) {
-  std::string cluster_name;
-  getValue({"cluster_name"}, &cluster_name);
-  *dest_svc_host = use_host_header
-                       ? getHeaderMapValue(HeaderMapType::RequestHeaders,
-                                           kAuthorityHeaderKey)
-                             ->toString()
-                       : "unknown";
+//   std::string cluster_name;
+//   getValue({"cluster_name"}, &cluster_name);
+//   *dest_svc_host = use_host_header
+//                        ? getHeaderMapValue(HeaderMapType::RequestHeaders,
+//                                            kAuthorityHeaderKey)
+//                              ->toString()
+//                        : "unknown";
 
-  if (cluster_name == kBlackHoleCluster ||
-      cluster_name == kPassThroughCluster ||
-      cluster_name == kInboundPassthroughClusterIpv4 ||
-      cluster_name == kInboundPassthroughClusterIpv6) {
-    *dest_svc_name = cluster_name;
-    return;
-  }
+//   if (cluster_name == kBlackHoleCluster ||
+//       cluster_name == kPassThroughCluster ||
+//       cluster_name == kInboundPassthroughClusterIpv4 ||
+//       cluster_name == kInboundPassthroughClusterIpv6) {
+//     *dest_svc_name = cluster_name;
+//     return;
+//   }
 
-  std::vector<absl::string_view> parts = absl::StrSplit(cluster_name, '|');
-  if (parts.size() == 4) {
-    *dest_svc_host = std::string(parts[3].data(), parts[3].size());
-  }
+//   std::vector<std::string_view> parts = absl::StrSplit(cluster_name, '|');
+//   if (parts.size() == 4) {
+//     *dest_svc_host = std::string(parts[3].data(), parts[3].size());
+//   }
 
-  extractServiceName(*dest_svc_host, dest_namespace, dest_svc_name);
+//   extractServiceName(*dest_svc_host, dest_namespace, dest_svc_name);
 }
 
 void populateRequestInfo(bool outbound, bool use_host_header_fallback,
@@ -308,8 +306,9 @@ google::protobuf::util::Status extractNodeMetadataValue(
   }
 
   // select keys from the metadata using the keys
-  const std::set<std::string> keys =
-      absl::StrSplit(keys_value.string_value(), ',', absl::SkipWhitespace());
+  const std::set<std::string> keys;
+  // const std::set<std::string> keys =
+  //     absl::StrSplit(keys_value.string_value(), ',', absl::SkipWhitespace());
   for (auto key : keys) {
     const auto entry_it = node_metadata.fields().find(key);
     if (entry_it == node_metadata.fields().end()) {

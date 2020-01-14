@@ -17,14 +17,13 @@
 
 #include <set>
 
-#include "absl/strings/string_view.h"
 #include "node_info.pb.h"
 #include "google/protobuf/struct.pb.h"
 
 namespace Wasm {
 namespace Common {
 
-using StringView = absl::string_view;
+using StringView = std::string_view;
 
 // Node metadata
 constexpr StringView WholeNodeKey = ".";

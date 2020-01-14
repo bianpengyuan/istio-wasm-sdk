@@ -24,10 +24,19 @@ def sdk_dependencies():
 
     # this must be named com_google_protobuf to match dependency pulled in by
     # rules_proto.
-    git_repository(
-        name = "com_google_protobuf",
-        remote = "https://github.com/protocolbuffers/protobuf",
-        commit = "655310ca192a6e3a050e0ca0b7084a2968072260",
+    # git_repository(
+    #     name = "com_google_protobuf",
+    #     remote = "https://github.com/protocolbuffers/protobuf",
+    #     commit = "655310ca192a6e3a050e0ca0b7084a2968072260",
+    #     patches = [
+    #         "@istio_wasm_sdk//bazel/external/patches:common.cc.patch",
+    #         "@istio_wasm_sdk//bazel/external/patches:configure.ac.patch",
+    #     ],
+    #     patch_args = ["-p1"],
+    # )
+    native.local_repository(
+        name="com_google_protobuf", 
+        path="/usr/local/google/home/bianpengyuan/protobuf",
     )
 
     new_git_repository(
@@ -48,12 +57,4 @@ def sdk_dependencies():
             "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
             "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
         ],
-    )
-
-    http_archive(
-        name = "com_google_absl",
-        sha256 = "3df5970908ed9a09ba51388d04661803a6af18c373866f442cede7f381e0b94a",
-        strip_prefix = "abseil-cpp-14550beb3b7b97195e483fb74b5efb906395c31e",
-        # 2019-07-31
-        urls = ["https://github.com/abseil/abseil-cpp/archive/14550beb3b7b97195e483fb74b5efb906395c31e.tar.gz"],
     )

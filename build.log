@@ -1,0 +1,19 @@
+INFO: Writing tracer profile to '/usr/local/google/home/bianpengyuan/.cache/bazel/_bazel_bianpengyuan/b98ad4a19c4f6fa4ef176d0fde2eee96/command.profile.gz'
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 12 targets (0 packages loaded, 0 targets configured)
+Analyzing: 12 targets (2 packages loaded, 3 targets configured)
+Analyzing: 12 targets (2 packages loaded, 3 targets configured)
+DEBUG: Rule 'com_google_protobuf' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1532723428 -0700"
+DEBUG: Call stack for the definition of repository 'com_google_protobuf' which is a git_repository (rule definition at /usr/local/google/home/bianpengyuan/.cache/bazel/_bazel_bianpengyuan/b98ad4a19c4f6fa4ef176d0fde2eee96/external/bazel_tools/tools/build_defs/repo/git.bzl:195:18):
+ - /usr/local/google/home/bianpengyuan/go/src/istio.io/istio-wasm-sdk/bazel/sdk_dependencies.bzl:27:5
+ - /usr/local/google/home/bianpengyuan/go/src/istio.io/istio-wasm-sdk/WORKSPACE:5:1
+ERROR: /usr/local/google/home/bianpengyuan/.cache/bazel/_bazel_bianpengyuan/b98ad4a19c4f6fa4ef176d0fde2eee96/external/com_google_protobuf/protobuf.bzl:269:38: The value 'REPOSITORY_NAME' has been removed in favor of 'repository_name()', please use the latter (https://docs.bazel.build/versions/master/skylark/lib/native.html#repository_name).
+ERROR: /usr/local/google/home/bianpengyuan/.cache/bazel/_bazel_bianpengyuan/b98ad4a19c4f6fa4ef176d0fde2eee96/external/com_google_protobuf/protobuf.bzl:270:31: The value 'PACKAGE_NAME' has been removed in favor of 'package_name()', please use the latter (https://docs.bazel.build/versions/master/skylark/lib/native.html#package_name). 
+ERROR: /usr/local/google/home/bianpengyuan/.cache/bazel/_bazel_bianpengyuan/b98ad4a19c4f6fa4ef176d0fde2eee96/external/com_google_protobuf/protobuf.bzl:270:9: The value 'PACKAGE_NAME' has been removed in favor of 'package_name()', please use the latter (https://docs.bazel.build/versions/master/skylark/lib/native.html#package_name). 
+ERROR: /usr/local/google/home/bianpengyuan/go/src/istio.io/istio-wasm-sdk/BUILD:63:1: every rule of type proto_library implicitly depends upon the target '@com_google_protobuf//:protoc', but this target could not be found because of: error loading package '@com_google_protobuf//': Extension 'protobuf.bzl' has errors
+ERROR: Analysis of target '//:node_info_cc_proto' failed; build aborted: error loading package '@com_google_protobuf//': Extension 'protobuf.bzl' has errors
+INFO: Elapsed time: 5.115s
+INFO: 0 processes.
+FAILED: Build did NOT complete successfully (3 packages loaded, 3 targets configured)
+FAILED: Build did NOT complete successfully (3 packages loaded, 3 targets configured)
