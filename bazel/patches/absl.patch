@@ -1,0 +1,22 @@
+diff --git a/absl/base/BUILD.bazel b/absl/base/BUILD.bazel
+index e825de0..0e9a153 100644
+--- a/absl/base/BUILD.bazel
++++ b/absl/base/BUILD.bazel
+@@ -127,7 +127,7 @@ cc_library(
+     copts = ABSL_DEFAULT_COPTS,
+     linkopts = select({
+         "//absl:windows": [],
+-        "//conditions:default": ["-pthread"],
++        "//conditions:default": [],
+     }) + ABSL_DEFAULT_LINKOPTS,
+     visibility = [
+         "//absl:__subpackages__",
+@@ -183,7 +183,7 @@ cc_library(
+     copts = ABSL_DEFAULT_COPTS,
+     linkopts = select({
+         "//absl:windows": [],
+-        "//conditions:default": ["-pthread"],
++        "//conditions:default": [],
+     }) + ABSL_DEFAULT_LINKOPTS,
+     deps = [
+         ":atomic_hook",

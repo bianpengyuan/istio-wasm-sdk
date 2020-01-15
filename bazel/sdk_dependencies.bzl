@@ -50,15 +50,14 @@ def sdk_dependencies():
         ],
     )
 
-    # http_archive(
-    #     name = "com_google_absl",
-    #     sha256 = "3df5970908ed9a09ba51388d04661803a6af18c373866f442cede7f381e0b94a",
-    #     strip_prefix = "abseil-cpp-14550beb3b7b97195e483fb74b5efb906395c31e",
-    #     # 2019-07-31
-    #     urls = ["https://github.com/abseil/abseil-cpp/archive/14550beb3b7b97195e483fb74b5efb906395c31e.tar.gz"],
-    # )
-
-    native.local_repository(
-        name="com_google_absl", 
-        path="/usr/local/google/home/bianpengyuan/abseil-cpp",
+    http_archive(
+        name = "com_google_absl",
+        sha256 = "3df5970908ed9a09ba51388d04661803a6af18c373866f442cede7f381e0b94a",
+        strip_prefix = "abseil-cpp-14550beb3b7b97195e483fb74b5efb906395c31e",
+        # 2019-07-31
+        urls = ["https://github.com/abseil/abseil-cpp/archive/14550beb3b7b97195e483fb74b5efb906395c31e.tar.gz"],
+        patches = [
+            "@istio_wasm_sdk//:bazel/patches/absl.patch",
+        ],
+        patch_args = ["-p1"],
     )
