@@ -17,7 +17,6 @@
 
 #include "util.h"
 
-#include "absl/strings/str_split.h"
 #include "proxy_wasm_intrinsics.h"
 
 namespace Wasm {
@@ -35,6 +34,15 @@ const char B3SpanID[] = "x-b3-spanid";
 const char B3TraceSampled[] = "x-b3-sampled";
 
 namespace {
+
+// Retrieves the traffic direction from the configuration context.
+TrafficDirection getTrafficDirection() {
+  int64_t direction;
+  if (getValue({"listener_direction"}, &direction)) {
+    return static_cast<TrafficDirection>(direction);
+  }
+  return TrafficDirection::Unspecified;
+}
 
 // Extract service name from service host.
 void extractServiceName(const std::string& host,
@@ -100,7 +108,8 @@ void getDestinationService(const std::string& dest_namespace,
     return;
   }
 
-  std::vector<absl::string_view> parts = absl::StrSplit(cluster_name, '|');
+  std::vector<std::string> parts;
+  split(cluster_name, '|', parts);
   if (parts.size() == 4) {
     *dest_svc_host = std::string(parts[3].data(), parts[3].size());
   }

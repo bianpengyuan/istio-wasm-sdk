@@ -49,11 +49,3 @@ def sdk_dependencies():
             "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
         ],
     )
-
-    http_archive(
-        name = "com_google_absl",
-        sha256 = "3df5970908ed9a09ba51388d04661803a6af18c373866f442cede7f381e0b94a",
-        strip_prefix = "abseil-cpp-14550beb3b7b97195e483fb74b5efb906395c31e",
-        # 2019-07-31
-        urls = ["https://github.com/abseil/abseil-cpp/archive/14550beb3b7b97195e483fb74b5efb906395c31e.tar.gz"],
-    )

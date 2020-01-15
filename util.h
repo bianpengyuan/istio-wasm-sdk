@@ -16,12 +16,15 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Wasm {
 namespace Common {
 
 // Parses an integer response flag into a readable short string.
 const std::string parseResponseFlag(uint64_t response_flag);
+
+void split(std::string strToSplit, char delimeter, std::vector<std::string>& parts);
 
 }  // namespace Common
 }  // namespace Wasm

@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <iostream>
 
 namespace Wasm {
 namespace Common {
@@ -164,6 +165,14 @@ const std::string parseResponseFlag(uint64_t response_flag) {
   }
 
   return result.empty() ? NONE : result;
+}
+
+void split(const std::string& strToSplit, char delimeter, std::vector<std::string>& parts) {
+  std::stringstream ss(strToSplit);
+  std::string item;
+  while (std::getline(ss, item, delimeter)) {
+    parts.push_back(item);
+  }
 }
 
 }  // namespace Common

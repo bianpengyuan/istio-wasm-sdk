@@ -15,7 +15,6 @@
 
 #include <unordered_map>
 
-#include "absl/strings/string_view.h"
 #include "node_info.pb.h"
 #include "proxy_wasm_intrinsics.h"
 
@@ -35,8 +34,8 @@ class NodeInfoCache {
   // At present this involves de-serializing to google.Protobuf.Struct and
   // then another round trip to NodeInfo. This Should at most hold N entries.
   // Node is owned by the cache. Do not store a reference.
-  NodeInfoPtr getPeerById(absl::string_view peer_metadata_id_key,
-                          absl::string_view peer_metadata_key);
+  NodeInfoPtr getPeerById(StringView peer_metadata_id_key,
+                          StringView peer_metadata_key);
 
   inline void setMaxCacheSize(int32_t size) {
     max_cache_size_ = size == 0 ? DefaultNodeCacheMaxSize : size;

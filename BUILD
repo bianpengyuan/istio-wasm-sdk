@@ -23,18 +23,20 @@ cc_library(
         "context.cc",
         "request_info.cc",
         "util.cc",
+        "node_info_cache.cc",
     ],
     hdrs = [
         "context.h",
         "request_info.h",
         "util.h",
+        "node_info_cache.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-        ":request_info_cc_proto",
         ":node_info_cc_proto",
+        ":request_info_cc_proto",
         "@com_google_protobuf//:protobuf",
         "@envoy_wasm_api//:proxy_wasm_intrinsics",
-        "@com_google_absl//absl/strings",
     ],
 )
 

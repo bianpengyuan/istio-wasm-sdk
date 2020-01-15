@@ -18,14 +18,13 @@
 #include <string>
 #include <unordered_map>
 
-#include "absl/strings/string_view.h"
 #include "node_info.pb.h"
 #include "request_info.pb.h"
 
 namespace Wasm {
 namespace Common {
 
-using StringView = absl::string_view;
+using StringView = std::string_view;
 
 const std::set<std::string> kGrpcContentTypes{
     "application/grpc", "application/grpc+proto", "application/grpc+json"};
@@ -53,6 +52,8 @@ enum class TrafficDirection : int64_t {
   Inbound = 1,
   Outbound = 2,
 };
+
+TrafficDirection getTrafficDirection();
 
 // RequestInfo lazily load request related information. It caches the request
 // attribute the first fetching it from the host. Since this is stateful, it
