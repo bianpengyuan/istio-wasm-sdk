@@ -1,4 +1,4 @@
-# Copyright 2019 Istio Authors. All Rights Reserved.
+# Copyright 2020 Istio Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,4 +15,18 @@
 ################################################################################
 #
 
-licenses(["notice"])
+cc_library(
+    name = "extension",
+    srcs = [
+        "extension.cc",
+    ],
+    hdrs = [
+        "extension.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//istio/extension/node_info",
+        "//istio/extension/stream_info",
+        "//istio/extension/stream_info:stream_info_cc_proto",
+    ],
+)

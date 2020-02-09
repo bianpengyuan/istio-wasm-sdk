@@ -17,11 +17,11 @@ syntax = "proto3";
 
 import "google/protobuf/wrappers.proto";
 
-package wasm.common;
+package istio.extension;
 
-// RequestInfo represents the information collected from filter stream
+// StreamInfo represents the information collected from filter stream
 // callbacks. This is used to fill metrics and logs.
-message RequestInfo {
+message StreamInfo {
   // Time of the first request byte received in nanoseconds.
   google.protobuf.Int64Value request_timestamp = 1;
 
@@ -67,10 +67,6 @@ message RequestInfo {
   // certificate.
   google.protobuf.StringValue source_principal = 15;
   google.protobuf.StringValue destination_principal = 16;
-
-  // Rbac filter policy id and result.
-  google.protobuf.StringValue rbac_permissive_policy_id = 17;
-  google.protobuf.StringValue rbac_permissive_engine_result = 18;
 
   // The total duration of the request and the response in nanoseconds.
   google.protobuf.Int64Value duration = 19;

@@ -15,30 +15,30 @@
 
 syntax = "proto3";
 
-package wasm.common;
+package istio.extension;
 
 // NodeInfo represents the information extracted from proxy node metadata, or
 // peer node metadata header This is used to fill metrics and log labels.
 message NodeInfo {
   // Name of the node. e.g. in k8s, name is the pod name.
-  string name = 1 [json_name = "NAME"];
+  string name = 1 [ json_name = "NAME" ];
 
   // Namespace that the node runs in.
-  string namespace = 2 [json_name = "NAMESPACE"];
+  string namespace = 2 [ json_name = "NAMESPACE" ];
 
   // K8s or vm workload attributes.
-  map<string, string> labels = 3 [json_name = "LABELS"];
-  string owner = 4 [json_name = "OWNER"];
-  string workload_name = 5 [json_name = "WORKLOAD_NAME"];
+  map<string, string> labels = 3 [ json_name = "LABELS" ];
+  string owner = 4 [ json_name = "OWNER" ];
+  string workload_name = 5 [ json_name = "WORKLOAD_NAME" ];
 
   // Platform metadata uses prefixed keys
   // GCP uses gcp_* keys
-  map<string, string> platform_metadata = 6 [json_name = "PLATFORM_METADATA"];
+  map<string, string> platform_metadata = 6 [ json_name = "PLATFORM_METADATA" ];
 
   // Version identifier for the proxy.
-  string istio_version = 7 [json_name = "ISTIO_VERSION"];
+  string istio_version = 7 [ json_name = "ISTIO_VERSION" ];
 
   // Unique identifier for the mesh. Taken from global mesh id parameter (or
   // the configured trust domain when not specified).
-  string mesh_id = 8 [json_name = "MESH_ID"];
+  string mesh_id = 8 [ json_name = "MESH_ID" ];
 }

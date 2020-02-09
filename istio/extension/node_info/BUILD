@@ -15,4 +15,34 @@
 ################################################################################
 #
 
-licenses(["notice"])
+cc_library(
+    name = "node_info",
+    srcs = [
+        "node_info.cc",
+        "node_info_cache.cc",
+    ],
+    hdrs = [
+        "node_info.h",
+        "node_info_cache.h",
+    ],
+    visibility = [
+        "//istio/extension:__pkg__",
+    ],
+    deps = [
+        ":node_info_cc_proto",
+        "//istio/extension/util",
+        "@com_google_absl//absl/strings",
+        "@envoy_wasm_api//:proxy_wasm_intrinsics",
+    ],
+)
+
+cc_proto_library(
+    name = "node_info_cc_proto",
+    visibility = ["//visibility:public"],
+    deps = ["node_info_proto"],
+)
+
+proto_library(
+    name = "node_info_proto",
+    srcs = ["node_info.proto"],
+)

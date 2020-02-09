@@ -1,4 +1,4 @@
-# Copyright 2019 Istio Authors. All Rights Reserved.
+# Copyright 2020 Istio Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,4 +15,19 @@
 ################################################################################
 #
 
-licenses(["notice"])
+cc_library(
+    name = "util",
+    srcs = [
+        "util.cc",
+    ],
+    hdrs = [
+        "util.h",
+    ],
+    visibility = [
+        "//istio/extension/node_info:__pkg__",
+        "//istio/extension/stream_info:__pkg__",
+    ],
+    deps = [
+        "@envoy_wasm_api//:proxy_wasm_intrinsics",
+    ],
+)

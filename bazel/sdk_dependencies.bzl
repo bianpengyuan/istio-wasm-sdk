@@ -3,14 +3,14 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def sdk_dependencies():
     http_archive(
-        name = 'emscripten_toolchain',
-        url = 'https://github.com/emscripten-core/emsdk/archive/a5082b232617c762cb65832429f896c838df2483.tar.gz',
-        build_file = '@istio_wasm_sdk//bazel/external:emscripten-toolchain.BUILD',
+        name = "emscripten_toolchain",
+        url = "https://github.com/emscripten-core/emsdk/archive/a5082b232617c762cb65832429f896c838df2483.tar.gz",
+        build_file = "@istio_wasm_sdk//bazel/external:emscripten-toolchain.BUILD",
         strip_prefix = "emsdk-a5082b232617c762cb65832429f896c838df2483",
         patch_cmds = [
             "./emsdk install 1.39.0-upstream",
             "./emsdk activate --embedded 1.39.0-upstream",
-        ]
+        ],
     )
 
     http_archive(
@@ -33,11 +33,11 @@ def sdk_dependencies():
     new_git_repository(
         name = "envoy_wasm_api",
         remote = "https://github.com/envoyproxy/envoy-wasm",
-        commit = "456bf9aef22d7b4df4916fa49c5dad2f5dbf0f0f",
+        commit = "5b10e3402e68c44b2caba14e944011b925c96671",
         workspace_file_content = 'workspace(name = "envoy_wasm_api")',
         strip_prefix = "api/wasm/cpp",
         patch_cmds = ["rm BUILD"],
-        build_file = '@istio_wasm_sdk//bazel/external:envoy-wasm-api.BUILD',
+        build_file = "@istio_wasm_sdk//bazel/external:envoy-wasm-api.BUILD",
     )
 
     http_archive(

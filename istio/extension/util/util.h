@@ -13,5 +13,26 @@
  * limitations under the License.
  */
 
-#pragma once
+#include <string>
 
+namespace Istio {
+namespace Extension {
+
+// TrafficDirection is a mirror of envoy xDS traffic direction.
+enum class TrafficDirection : int64_t {
+  Unspecified = 0,
+  Inbound = 1,
+  Outbound = 2,
+};
+
+namespace Util {
+
+// Retrieves the traffic direction from the configuration context.
+TrafficDirection getTrafficDirection();
+
+// Parses an integer response flag into a readable short string.
+const std::string parseResponseFlag(uint64_t response_flag);
+
+} // namespace Util
+} // namespace Extension
+} // namespace Istio

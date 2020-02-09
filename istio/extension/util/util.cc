@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-#include "util.h"
+#include "istio/extension/util/util.h"
 
-#include <string>
+#include "proxy_wasm_intrinsics.h"
 
-namespace Wasm {
-namespace Common {
+namespace Istio {
+namespace Extension {
+namespace Util {
 
 namespace {
 
@@ -70,7 +71,7 @@ enum ResponseFlag {
   LastFlag = DownstreamProtocolError
 };
 
-void appendString(std::string& result, const std::string& append) {
+void appendString(std::string &result, const std::string &append) {
   if (result.empty()) {
     result = append;
   } else {
@@ -78,7 +79,15 @@ void appendString(std::string& result, const std::string& append) {
   }
 }
 
-}  // namespace
+} // namespace
+
+TrafficDirection getTrafficDirection() {
+  int64_t direction;
+  if (getValue({"listener_direction"}, &direction)) {
+    return static_cast<TrafficDirection>(direction);
+  }
+  return TrafficDirection::Unspecified;
+}
 
 const std::string parseResponseFlag(uint64_t response_flag) {
   std::string result;
@@ -168,5 +177,6 @@ const std::string parseResponseFlag(uint64_t response_flag) {
   return result.empty() ? NONE : result;
 }
 
-}  // namespace Common
-}  // namespace Wasm
+} // namespace Util
+} // namespace Extension
+} // namespace Istio
