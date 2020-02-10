@@ -16,3 +16,8 @@
 #
 
 licenses(["notice"])
+
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix istio/test/framework
+gazelle(name = "gazelle")

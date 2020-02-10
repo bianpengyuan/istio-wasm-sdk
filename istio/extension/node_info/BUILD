@@ -1,3 +1,7 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
 # Copyright 2019 Istio Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,4 +49,28 @@ cc_proto_library(
 proto_library(
     name = "node_info_proto",
     srcs = ["node_info.proto"],
+)
+
+proto_library(
+    name = "istio_extension_proto",
+    srcs = ["node_info.proto"],
+    visibility = ["//visibility:public"],
+)
+
+go_proto_library(
+    name = "istio_extension_go_proto",
+    importpath = "istio/test/framework/istio/extension/node_info",
+    proto = ":istio_extension_proto",
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "node_info.h",
+        "node_info_cache.h",
+    ],
+    embed = [":istio_extension_go_proto"],
+    importpath = "istio/test/framework/istio/extension/node_info",
+    visibility = ["//visibility:public"],
 )
