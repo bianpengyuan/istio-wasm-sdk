@@ -36,7 +36,7 @@ cc_library(
         ":node_info_cc_proto",
         "//istio/extension/util",
         "@com_google_absl//absl/strings",
-        "@envoy_wasm_api//:proxy_wasm_intrinsics",
+        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )
 

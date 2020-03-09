@@ -28,6 +28,6 @@ cc_library(
         "//istio/extension/stream_info:__pkg__",
     ],
     deps = [
-        "@envoy_wasm_api//:proxy_wasm_intrinsics",
+        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )

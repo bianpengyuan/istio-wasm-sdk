@@ -98,7 +98,7 @@ void getDestinationService(StringView dest_namespace, bool use_host_header,
   std::string cluster_name;
   getValue({"cluster_name"}, &cluster_name);
   *dest_svc_host = use_host_header
-                       ? getHeaderMapValue(HeaderMapType::RequestHeaders,
+                       ? getHeaderMapValue(WasmHeaderMapType::RequestHeaders,
                                            kAuthorityHeaderKey)
                              ->toString()
                        : "unknown";
@@ -268,7 +268,7 @@ const std::string &ExtensionStreamContext::requestProtocol() {
   if (!stream_info_.has_request_protocol()) {
     // TODO Add http/1.1, http/1.0, http/2 in a separate attribute.
     // http|grpc classification is compatible with Mixerclient
-    if (kGrpcContentTypes.count(getHeaderMapValue(HeaderMapType::RequestHeaders,
+    if (kGrpcContentTypes.count(getHeaderMapValue(WasmHeaderMapType::RequestHeaders,
                                                   kContentTypeHeaderKey)
                                     ->toString()) != 0) {
       stream_info_.mutable_request_protocol()->set_value(kProtocolGRPC);
