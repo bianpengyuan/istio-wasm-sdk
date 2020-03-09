@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "envoy.go",
         "envoy_conf.go",
+        "framework.go",
         "http_client.go",
         "http_server.go",
         "ports.go",

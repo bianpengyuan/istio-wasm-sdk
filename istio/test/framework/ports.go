@@ -12,52 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package env
+package framework
 
 import (
+	"errors"
 	"log"
+	"sync"
 )
 
 // Dynamic port allocation scheme
 // In order to run the tests in parallel. Each test should use unique ports
 // Each test has a unique test_name, its ports will be allocated based on that name
 
-// All tests should be listed here to get their test ids
-const (
-	BasicFlowTest uint16 = iota
-
-	BasicTCPFlowTest
-
-	StackdriverPluginTest
-
-	TCPMetadataExchangeTest
-	TCPMetadataExchangeFailTest
-	HTTPMetadataExchangeTest
-
-	// xDS driven tests
-	BasicHTTP
-	BasicHTTPwithTLS
-	StackDriverPayload
-	StackDriverPayloadGateway
-	StackDriverPayloadWithTLS
-	StackDriverReload
-	StackDriverParallel
-	BasicHTTPGateway
-	StatsPayload
-	StatsParallel
-	StatsWasm
-
-	StatsPluginTest
-
-	// The number of total tests. has to be the last one.
-	maxTestNum
-)
-
 const (
 	portBase uint16 = 20000
 	// Maximum number of ports used in each test.
 	portNum uint16 = 20
 )
+
+type PortAllocator struct {
+	testIndex uint16
+	mux sync.Mutex
+}
 
 // Ports stores all used ports
 type Ports struct {
@@ -70,16 +46,29 @@ type Ports struct {
 	SDPort                  uint16
 }
 
-func allocPortBase(name uint16) uint16 {
-	base := portBase + name*portNum
-	for i := 0; i < 10; i++ {
+func (p *PortAllocator) AllocatePorts() (*Ports, error) {
+	p.mux.Lock()
+	p.mux.Unlock()
+	base := portBase + p.testIndex*portNum
+	for base+portNum <= 65535 {
 		if allPortFree(base, portNum) {
-			return base
+			break
 		}
-		base += maxTestNum * portNum
+		base += p.testIndex * portNum
 	}
-	log.Println("could not find free ports, continue the test...")
-	return base
+	if base + portNum > 65535 {
+		return nil, errors.New("Cannot find valid port range for test")
+	}
+	p.testIndex += 1
+	return &Ports{
+		BackendPort:             base,
+		ClientAdminPort:         base + 1,
+		AppToClientProxyPort:    base + 2,
+		ClientToServerProxyPort: base + 3,
+		ServerAdminPort:         base + 4,
+		XDSPort:                 base + 5,
+		SDPort:                  base + 6,
+	}, nil
 }
 
 func allPortFree(base uint16, ports uint16) bool {
@@ -93,15 +82,15 @@ func allPortFree(base uint16, ports uint16) bool {
 }
 
 // NewPorts allocate all ports based on test id.
-func NewPorts(name uint16) *Ports {
-	base := allocPortBase(name)
-	return &Ports{
-		BackendPort:             base,
-		ClientAdminPort:         base + 1,
-		AppToClientProxyPort:    base + 2,
-		ClientToServerProxyPort: base + 3,
-		ServerAdminPort:         base + 4,
-		XDSPort:                 base + 5,
-		SDPort:                  base + 6,
-	}
-}
+// func NewPorts(name uint16) *Ports {
+// 	base := allocPortBase(name)
+// 	return &Ports{
+// 		BackendPort:             base,
+// 		ClientAdminPort:         base + 1,
+// 		AppToClientProxyPort:    base + 2,
+// 		ClientToServerProxyPort: base + 3,
+// 		ServerAdminPort:         base + 4,
+// 		XDSPort:                 base + 5,
+// 		SDPort:                  base + 6,
+// 	}
+// }

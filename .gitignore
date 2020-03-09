@@ -10,3 +10,4 @@ user.bazelrc
 compile_commands.json
 build.log
 /.vscode
+istio/test/framework/istio_proxy/*

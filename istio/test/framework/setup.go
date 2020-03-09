@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package env
+package framework
 
 import (
 	"encoding/json"
@@ -28,9 +28,8 @@ import (
 	"github.com/prometheus/common/expfmt"
 )
 
-// TestSetup store data for a test.
-type TestSetup struct {
-	// EnvoyParams contain extra envoy parameters to pass in the CLI (cluster, node)
+type TestConfig struct {
+	// EnvoyParams contain extra envoy parameters to pass in the CLI.
 	EnvoyParams []string
 	// ClientEnvoyTemplate is the bootstrap config used by client envoy.
 	ClientEnvoyTemplate string
@@ -38,8 +37,8 @@ type TestSetup struct {
 	ServerEnvoyTemplate string
 
 	/* 
-	 *   Filters config
-	 */
+	*   Filters config
+	*/
 	// FiltersBeforeEnvoyRouterInAppToClient are the filters that come before envoy.router http filter in AppToClient
 	// listener.
 	FiltersBeforeEnvoyRouterInAppToClient string
@@ -51,16 +50,16 @@ type TestSetup struct {
 	FiltersBeforeEnvoyRouterInProxyToServer string
 
 	/* 
-	 *   Node metadata
-	 */
+	*   Node metadata
+	*/
 	// Server side Envoy node metadata.
 	ServerNodeMetadata string
 	// Client side Envoy node metadata.
 	ClientNodeMetadata string
 
 	/* 
-	 *   Access log configuration
-	 */
+	*   Access log configuration
+	*/
 	// AccessLogPath is the access log path for Envoy
 	AccessLogPath string
 	// AccessLogPath is the access log path for the client Envoy
@@ -73,8 +72,8 @@ type TestSetup struct {
 	ServerAccesslogFormat string
 
 	/* 
-	 *   TLS configuration
-	 */
+	*   TLS configuration
+	*/
 	// TLSContext to be used.
 	TLSContext string
 	// ClusterTLSContext to be used.
@@ -87,10 +86,15 @@ type TestSetup struct {
 	UpstreamFiltersInClient string
 
 	/* 
-	 *   Extra top level configuration
-	 */
+	*   Extra top level configuration
+	*/
 	// ExtraConfig that needs to be passed to envoy. Ex stats_config.
 	ExtraConfig string
+}
+
+// TestSetup store data for a test.
+type TestSetup struct {
+	tc TestConfig
 
 	// Dir is the working dir for envoy
 	Dir string
@@ -124,16 +128,16 @@ type Stat struct {
 	Labels map[string]string
 }
 
-func NewClientServerEnvoyTestSetup(name uint16, t *testing.T) *TestSetup {
-	return &TestSetup{
-		t:                   t,
-		startHTTPBackend:    true,
-		ports:               NewPorts(name),
-		testName:            name,
-		ClientAccessLogPath: "/tmp/envoy-client-access.log",
-		ServerAccessLogPath: "/tmp/envoy-server-access.log",
-	}
-}
+// func NewClientServerEnvoyTestSetup(name uint16, t *testing.T) *TestSetup {
+// 	return &TestSetup{
+// 		t:                   t,
+// 		startHTTPBackend:    true,
+// 		ports:               NewPorts(name),
+// 		testName:            name,
+// 		ClientAccessLogPath: "/tmp/envoy-client-access.log",
+// 		ServerAccessLogPath: "/tmp/envoy-server-access.log",
+// 	}
+// }
 
 // Ports get ports object
 func (s *TestSetup) Ports() *Ports {
@@ -166,79 +170,6 @@ func (s *TestSetup) SetStartTCPBackend(yes bool) {
 // SetCopyYamlFiles set copyYamlFiles flag
 func (s *TestSetup) SetCopyYamlFiles(yes bool) {
 	s.copyYamlFiles = yes
-}
-
-// SetFiltersBeforeEnvoyRouterInAppToClient sets the configurations of the filters that come before envoy.router http
-// filter in AppToClient listener.
-func (s *TestSetup) SetFiltersBeforeEnvoyRouterInAppToClient(filters string) {
-	s.FiltersBeforeEnvoyRouterInAppToClient = filters
-}
-
-// SetEnableTLS sets EnableTLS.
-func (s *TestSetup) SetEnableTLS(enableTLS bool) {
-	s.EnableTLS = enableTLS
-}
-
-// SetTLSContext sets TLS COntext.
-func (s *TestSetup) SetTLSContext(tlsContext string) {
-	s.TLSContext = tlsContext
-}
-
-// SetTLSContext sets TLS COntext.
-func (s *TestSetup) SetClusterTLSContext(clusterTLSContext string) {
-	s.ClusterTLSContext = clusterTLSContext
-}
-
-// SetTLSContext sets TLS COntext.
-func (s *TestSetup) SetServerTLSContext(tlsContext string) {
-	s.ServerTLSContext = tlsContext
-}
-
-// SetTLSContext sets TLS COntext.
-func (s *TestSetup) SetServerClusterTLSContext(clusterTLSContext string) {
-	s.ServerClusterTLSContext = clusterTLSContext
-}
-
-// SetFiltersBeforeEnvoyRouterInProxyToServer sets the configurations of the filters tthat come before envoy.router http
-// filter in ProxyToServer listener.
-func (s *TestSetup) SetFiltersBeforeEnvoyRouterInProxyToServer(filters string) {
-	s.FiltersBeforeEnvoyRouterInProxyToServer = filters
-}
-
-// SetFiltersBeforeHTTPConnectionManagerInProxyToServer sets the configurations of the filters that come before http
-// connection manager filter in ProxyToServer listener.
-func (s *TestSetup) SeFiltersBeforeHTTPConnectionManagerInProxyToServer(filters string) {
-	s.FiltersBeforeHTTPConnectionManagerInProxyToServer = filters
-}
-
-// SetServerNodeMetadata sets envoy's node metadata.
-func (s *TestSetup) SetServerNodeMetadata(metadata string) {
-	s.ServerNodeMetadata = metadata
-}
-
-// SetClientNodeMetadata sets envoy's node metadata.
-func (s *TestSetup) SetClientNodeMetadata(metadata string) {
-	s.ClientNodeMetadata = metadata
-}
-
-// SetAccessLogFormat sets the accesslogformat.
-func (s *TestSetup) SetAccessLogFormat(accesslogformat string) {
-	s.AccesslogFormat = accesslogformat
-}
-
-// SetServerAccessLogFormat sets the serverAccesslogformat.
-func (s *TestSetup) SetServerAccessLogFormat(serverAccesslogformat string) {
-	s.ServerAccesslogFormat = serverAccesslogformat
-}
-
-// SetUpstreamFiltersInClient sets upstream filters chain in client envoy..
-func (s *TestSetup) SetUpstreamFiltersInClient(upstreamFiltersInClient string) {
-	s.UpstreamFiltersInClient = upstreamFiltersInClient
-}
-
-// SetExtraConfig sets extra config in client and server envoy.
-func (s *TestSetup) SetExtraConfig(extraConfig string) {
-	s.ExtraConfig = extraConfig
 }
 
 func (s *TestSetup) SetUpClientServerEnvoy() error {

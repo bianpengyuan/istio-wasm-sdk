@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package env
+package framework
 
 import (
 	"fmt"
@@ -22,6 +22,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	"encoding/json"
+	"net/http"
+	"io"
+	"io/ioutil"
 )
 
 // Envoy stores data for Envoy process
@@ -34,8 +38,8 @@ type Envoy struct {
 // NewClientEnvoy creates a new Client Envoy struct and starts envoy.
 func (s *TestSetup) NewClientEnvoy() (*Envoy, error) {
 	confTmpl := envoyClientConfTemplYAML
-	if s.ClientEnvoyTemplate != "" {
-		confTmpl = s.ClientEnvoyTemplate
+	if s.tc.ClientEnvoyTemplate != "" {
+		confTmpl = s.tc.ClientEnvoyTemplate
 	}
 	baseID := strconv.Itoa(int(s.testName)*2 + 1)
 
@@ -45,8 +49,8 @@ func (s *TestSetup) NewClientEnvoy() (*Envoy, error) {
 // NewServerEnvoy creates a new Server Envoy struct and starts envoy.
 func (s *TestSetup) NewServerEnvoy() (*Envoy, error) {
 	confTmpl := envoyServerConfTemplYAML
-	if s.ServerEnvoyTemplate != "" {
-		confTmpl = s.ServerEnvoyTemplate
+	if s.tc.ServerEnvoyTemplate != "" {
+		confTmpl = s.tc.ServerEnvoyTemplate
 	}
 	baseID := strconv.Itoa(int(s.testName+1) * 2)
 
@@ -107,6 +111,69 @@ func copyYamlFiles(src, dst string) {
 	}
 }
 
+func copyFile(src, dst string) error {
+    in, err := os.Open(src)
+    if err != nil {
+        return err
+    }
+    defer in.Close()
+
+    out, err := os.Create(dst)
+    if err != nil {
+        return err
+    }
+    defer out.Close()
+
+    _, err = io.Copy(out, in)
+    if err != nil {
+        return err
+    }
+    return out.Close()
+}
+
+func downloadEnvoy(ver string) (string, error) {
+	proxyDepUrl := fmt.Sprintf("https://raw.githubusercontent.com/istio/istio/%v/istio.deps", ver)
+	resp, err := http.Get(proxyDepUrl)
+	if err != nil {
+		return "", fmt.Errorf("cannot get envoy sha from %v: %v", proxyDepUrl, err)
+	}
+	defer resp.Body.Close()
+	istioDeps, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("cannot read body of istio deps: %v", err)
+	}
+
+	var deps []interface{}
+	json.Unmarshal([]byte(istioDeps), &deps)
+	proxySHA := ""
+	for _, d := range deps {
+		if dm, ok := d.(map[string]string); ok && dm["repoName"] == "proxy" {
+			proxySHA = dm["lastStableSHA"]
+		}
+	}
+
+	dst := fmt.Sprintf("istio-proxy/envoy-%v", proxySHA)
+	if _, err := os.Stat(dst); err == nil {
+	  return dst, nil
+	}
+	envoyURL := fmt.Sprintf("https://storage.googleapis.com/istio-build/proxy/envoy-alpha-%v.tar.gz", proxySHA)
+	donwloadCmd := exec.Command(fmt.Sprintf("curl -fLSs %v | tar xz", envoyURL))
+	donwloadCmd.Stderr = os.Stderr
+	donwloadCmd.Stdout = os.Stdout
+	err = donwloadCmd.Start()
+	if err != nil {
+		return "", fmt.Errorf("fail to run envoy download command: %v", err)
+	}
+	src := "usr/local/envoy"
+	if _, err := os.Stat(src); err != nil {
+        return "", fmt.Errorf("fail to find downloaded envoy: %v", err)
+	}
+	defer os.RemoveAll("usr/")
+	copyFile(src, dst)
+	
+	return dst, nil
+}
+
 // NewEnvoy creates a new Envoy struct and starts envoy at the specified port.
 func newEnvoy(port uint16, confTmpl, baseID, yamlName string, s *TestSetup) (*Envoy, error) {
 	confPath := filepath.Join(GetDefaultIstioOut(), fmt.Sprintf("config.conf.%v.yaml", port))
@@ -146,14 +213,16 @@ func newEnvoy(port uint16, confTmpl, baseID, yamlName string, s *TestSetup) (*En
 			"--parent-shutdown-time-s", "1",
 			"--restart-epoch", strconv.Itoa(s.epoch))
 	}
-	if s.EnvoyParams != nil {
-		args = append(args, s.EnvoyParams...)
+	if s.tc.EnvoyParams != nil {
+		args = append(args, s.tc.EnvoyParams...)
 	}
-	/* #nosec */
-	envoyPath := filepath.Join(GetDefaultEnvoyBin(), "envoy")
-	if path, exists := os.LookupEnv("ENVOY_PATH"); exists {
-		envoyPath = path
+
+	// Download the test envoy binary. Right now only download one version
+	envoyPath, err := downloadEnvoy("release-1.5")
+	if err != nil {
+		return nil, err
 	}
+
 	cmd := exec.Command(envoyPath, args...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout

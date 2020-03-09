@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package env
+package framework
 
 import (
 	"fmt"
@@ -147,7 +147,7 @@ static_resources:
 // CreateEnvoyConf create envoy config.
 func (s *TestSetup) CreateEnvoyConf(path, confTmpl string) error {
 	if s.stress {
-		s.AccessLogPath = "/dev/null"
+		s.tc.AccessLogPath = "/dev/null"
 	}
 
 	tmpl, err := template.New("test").Funcs(template.FuncMap{
