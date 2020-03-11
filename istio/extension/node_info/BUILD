@@ -56,21 +56,3 @@ proto_library(
     srcs = ["node_info.proto"],
     visibility = ["//visibility:public"],
 )
-
-go_proto_library(
-    name = "istio_extension_go_proto",
-    importpath = "istio/test/framework/istio/extension/node_info",
-    proto = ":istio_extension_proto",
-    visibility = ["//visibility:public"],
-)
-
-go_library(
-    name = "go_default_library",
-    srcs = [
-        "node_info.h",
-        "node_info_cache.h",
-    ],
-    embed = [":istio_extension_go_proto"],
-    importpath = "istio/test/framework/istio/extension/node_info",
-    visibility = ["//visibility:public"],
-)

@@ -56,18 +56,3 @@ proto_library(
     visibility = ["//visibility:public"],
     deps = ["@com_google_protobuf//:wrappers_proto"],
 )
-
-go_proto_library(
-    name = "istio_extension_go_proto",
-    importpath = "istio/test/framework/istio/extension/stream_info",
-    proto = ":istio_extension_proto",
-    visibility = ["//visibility:public"],
-)
-
-go_library(
-    name = "go_default_library",
-    srcs = ["stream_info.h"],
-    embed = [":istio_extension_go_proto"],
-    importpath = "istio/test/framework/istio/extension/stream_info",
-    visibility = ["//visibility:public"],
-)
