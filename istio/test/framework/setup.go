@@ -28,7 +28,7 @@ import (
 	"github.com/prometheus/common/expfmt"
 )
 
-type TestConfig struct {
+type TestEnvoyConfig struct {
 	// EnvoyParams contain extra envoy parameters to pass in the CLI.
 	EnvoyParams []string
 	// ClientEnvoyTemplate is the bootstrap config used by client envoy.
@@ -90,17 +90,19 @@ type TestConfig struct {
 	*/
 	// ExtraConfig that needs to be passed to envoy. Ex stats_config.
 	ExtraConfig string
+
+	// Allocated Ports for Envoy process.
+	Ports       *Ports
 }
 
 // TestSetup store data for a test.
 type TestSetup struct {
-	tc TestConfig
+	tec TestEnvoyConfig
 
 	// Dir is the working dir for envoy
 	Dir string
 
 	t           *testing.T
-	ports       *Ports
 	clientEnvoy *Envoy
 	serverEnvoy *Envoy
 	httpBackend *HTTPServer
@@ -132,17 +134,17 @@ type Stat struct {
 // 	return &TestSetup{
 // 		t:                   t,
 // 		startHTTPBackend:    true,
-// 		ports:               NewPorts(name),
+// 		Ports:               NewPorts(name),
 // 		testName:            name,
 // 		ClientAccessLogPath: "/tmp/envoy-client-access.log",
 // 		ServerAccessLogPath: "/tmp/envoy-server-access.log",
 // 	}
 // }
 
-// Ports get ports object
-func (s *TestSetup) Ports() *Ports {
-	return s.ports
-}
+// Ports get Ports object
+// func (e *TestSetup) Ports() *Ports {
+// 	return e.Ports
+// }
 
 // SetStress set the stress flag
 func (s *TestSetup) SetStress(stress bool) {
@@ -175,34 +177,34 @@ func (s *TestSetup) SetCopyYamlFiles(yes bool) {
 func (s *TestSetup) SetUpClientServerEnvoy() error {
 	var err error
 
-	log.Printf("Creating server envoy at %v", s.ports.ServerAdminPort)
+	log.Printf("Creating server envoy at %v", s.tec.Ports.ServerAdminPort)
 	s.serverEnvoy, err = s.NewServerEnvoy()
 	if err != nil {
 		log.Printf("unable to create Envoy %v", err)
 		return err
 	}
 
-	log.Printf("Starting server envoy at %v", s.ports.ServerAdminPort)
-	err = s.serverEnvoy.Start(s.ports.ServerAdminPort)
+	log.Printf("Starting server envoy at %v", s.tec.Ports.ServerAdminPort)
+	err = s.serverEnvoy.Start(s.tec.Ports.ServerAdminPort)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Creating client envoy at %v", s.ports.ClientAdminPort)
+	log.Printf("Creating client envoy at %v", s.tec.Ports.ClientAdminPort)
 	s.clientEnvoy, err = s.NewClientEnvoy()
 	if err != nil {
 		log.Printf("unable to create Envoy %v", err)
 		return err
 	}
 
-	log.Printf("Starting client envoy at %v", s.ports.ClientAdminPort)
-	err = s.clientEnvoy.Start(s.ports.ClientAdminPort)
+	log.Printf("Starting client envoy at %v", s.tec.Ports.ClientAdminPort)
+	err = s.clientEnvoy.Start(s.tec.Ports.ClientAdminPort)
 	if err != nil {
 		return err
 	}
 
 	if s.startHTTPBackend {
-		s.httpBackend, err = NewHTTPServer(s.ports.BackendPort, s.EnableTLS, s.Dir)
+		s.httpBackend, err = NewHTTPServer(s.tec.Ports.BackendPort, s.EnableTLS, s.Dir)
 		if err != nil {
 			log.Printf("unable to create HTTP server %v", err)
 		} else {
@@ -213,7 +215,7 @@ func (s *TestSetup) SetUpClientServerEnvoy() error {
 		}
 	}
 	if s.startTCPBackend {
-		s.tcpBackend, err = NewTCPServer(s.ports.BackendPort, "hello", s.EnableTLS, s.Dir)
+		s.tcpBackend, err = NewTCPServer(s.tec.Ports.BackendPort, "hello", s.EnableTLS, s.Dir)
 		if err != nil {
 			log.Printf("unable to create TCP server %v", err)
 		} else {
@@ -231,12 +233,12 @@ func (s *TestSetup) SetUpClientServerEnvoy() error {
 }
 
 func (s *TestSetup) TearDownClientServerEnvoy() {
-	if err := s.clientEnvoy.Stop(s.Ports().ClientAdminPort); err != nil {
+	if err := s.clientEnvoy.Stop(s.tec.Ports.ClientAdminPort); err != nil {
 		s.t.Errorf("error quitting client envoy: %v", err)
 	}
 	s.clientEnvoy.TearDown()
 
-	if err := s.serverEnvoy.Stop(s.Ports().ServerAdminPort); err != nil {
+	if err := s.serverEnvoy.Stop(s.tec.Ports.ServerAdminPort); err != nil {
 		s.t.Errorf("error quitting client envoy: %v", err)
 	}
 	s.serverEnvoy.TearDown()
@@ -283,7 +285,7 @@ type stats struct {
 
 // WaitEnvoyReady waits until envoy receives and applies all config
 func (s *TestSetup) WaitEnvoyReady(port uint16) {
-	// Sometimes on circle CI, connection is refused even when envoy reports warm clusters and listeners...
+	// Sometimes on circle CI, connection is refused even when envoy rePorts warm clusters and listeners...
 	// Inject a 1 second delay to force readiness
 	time.Sleep(1 * time.Second)
 
@@ -309,12 +311,12 @@ func (s *TestSetup) WaitEnvoyReady(port uint16) {
 
 // WaitClientEnvoyReady waits until envoy receives and applies all config
 func (s *TestSetup) WaitClientEnvoyReady() {
-	s.WaitEnvoyReady(s.Ports().ClientAdminPort)
+	s.WaitEnvoyReady(s.tec.Ports.ClientAdminPort)
 }
 
 // WaitEnvoyReady waits until envoy receives and applies all config
 func (s *TestSetup) WaitServerEnvoyReady() {
-	s.WaitEnvoyReady(s.Ports().ServerAdminPort)
+	s.WaitEnvoyReady(s.tec.Ports.ServerAdminPort)
 }
 
 // UnmarshalStats Unmarshals Envoy stats from JSON format into a map, where stats name is

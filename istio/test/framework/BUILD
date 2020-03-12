@@ -8,7 +8,7 @@ go_library(
         "framework.go",
         "http_client.go",
         "http_server.go",
-        "ports.go",
+        "Ports.go",
         "setup.go",
         "tcp_envoy_conf.go",
         "tcp_server.go",

@@ -147,7 +147,7 @@ static_resources:
 // CreateEnvoyConf create envoy config.
 func (s *TestSetup) CreateEnvoyConf(path, confTmpl string) error {
 	if s.stress {
-		s.tc.AccessLogPath = "/dev/null"
+		s.tec.AccessLogPath = "/dev/null"
 	}
 
 	tmpl, err := template.New("test").Funcs(template.FuncMap{
@@ -170,7 +170,7 @@ func (s *TestSetup) CreateEnvoyConf(path, confTmpl string) error {
 		_ = f.Close()
 	}()
 
-	return tmpl.Execute(f, s)
+	return tmpl.Execute(f, s.tec)
 }
 
 func indent(n int, s string) string {

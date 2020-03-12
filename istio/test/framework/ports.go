@@ -21,12 +21,12 @@ import (
 )
 
 // Dynamic port allocation scheme
-// In order to run the tests in parallel. Each test should use unique ports
-// Each test has a unique test_name, its ports will be allocated based on that name
+// In order to run the tests in parallel. Each test should use unique Ports
+// Each test has a unique test_name, its Ports will be allocated based on that name
 
 const (
 	portBase uint16 = 20000
-	// Maximum number of ports used in each test.
+	// Maximum number of Ports used in each test.
 	portNum uint16 = 20
 )
 
@@ -35,7 +35,7 @@ type PortAllocator struct {
 	mux sync.Mutex
 }
 
-// Ports stores all used ports
+// Ports stores all used Ports
 type Ports struct {
 	BackendPort             uint16
 	ClientAdminPort         uint16
@@ -71,8 +71,8 @@ func (p *PortAllocator) AllocatePorts() (*Ports, error) {
 	}, nil
 }
 
-func allPortFree(base uint16, ports uint16) bool {
-	for port := base; port < base+ports; port++ {
+func allPortFree(base uint16, Ports uint16) bool {
+	for port := base; port < base+Ports; port++ {
 		if IsPortUsed(port) {
 			log.Println("port is used ", port)
 			return false
@@ -81,7 +81,7 @@ func allPortFree(base uint16, ports uint16) bool {
 	return true
 }
 
-// NewPorts allocate all ports based on test id.
+// NewPorts allocate all Ports based on test id.
 // func NewPorts(name uint16) *Ports {
 // 	base := allocPortBase(name)
 // 	return &Ports{

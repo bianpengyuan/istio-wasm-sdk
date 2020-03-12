@@ -16,6 +16,8 @@ package framework
 
 import (
 	"testing"
+
+	"github.com/bianpengyuan/istio-wasm-sdk/istio/test/testdata"
 )
 
 var pa = PortAllocator{
@@ -24,11 +26,11 @@ var pa = PortAllocator{
 
 type Test struct {
 	gt *testing.T
-	tc TestConfig
-	ports *Ports
+	tec TestEnvoyConfig
+	Ports *Ports
 }
 
-func NewTest(config TestConfig, t *testing.T) *Test {
+func NewTest(config TestEnvoyConfig, t *testing.T) *Test {
 	// Set up default access log path if not set
 	if config.ClientAccessLogPath == "" {
 		config.ClientAccessLogPath = "/tmp/envoy-client-access.log"
@@ -38,22 +40,31 @@ func NewTest(config TestConfig, t *testing.T) *Test {
 	}
 	return &Test{
 		gt: t,
-		tc: config,
+		tec: config,
 	}
 }
 
 func (t *Test) Run(fn func()) {
 	// Alloc testing ports
-	ports, err := pa.AllocatePorts()
+	var err error
+	t.tec.Ports, err = pa.AllocatePorts()
 	if err != nil {
 		t.gt.Errorf("cannot alloc valid port for the test: %v", err)
 		return
 	}
+
+	// Set up default node metadata if not provided.
+	if t.tec.ClientNodeMetadata == "" {
+		t.tec.ClientNodeMetadata = testdata.ClientNodeMetadata
+	}
+	if t.tec.ServerNodeMetadata == "" {
+		t.tec.ServerNodeMetadata = testdata.ServerNodeMetadata
+	}
+
 	ts := TestSetup{
 		t:                   t.gt,
-		tc:                  t.tc,
+		tec:                 t.tec,
 		startHTTPBackend:    true,
-		ports:               ports,
 	}
 	// Start up Envoyproxy
 	if err = ts.SetUpClientServerEnvoy(); err != nil {

@@ -24,37 +24,36 @@ import (
 	"time"
 	"encoding/json"
 	"net/http"
-	"io"
 	"io/ioutil"
 )
 
 // Envoy stores data for Envoy process
 type Envoy struct {
 	cmd    *exec.Cmd
-	ports  *Ports
+	Ports  *Ports
 	baseID string
 }
 
 // NewClientEnvoy creates a new Client Envoy struct and starts envoy.
 func (s *TestSetup) NewClientEnvoy() (*Envoy, error) {
 	confTmpl := envoyClientConfTemplYAML
-	if s.tc.ClientEnvoyTemplate != "" {
-		confTmpl = s.tc.ClientEnvoyTemplate
+	if s.tec.ClientEnvoyTemplate != "" {
+		confTmpl = s.tec.ClientEnvoyTemplate
 	}
 	baseID := strconv.Itoa(int(s.testName)*2 + 1)
 
-	return newEnvoy(s.ports.ClientAdminPort, confTmpl, baseID, "client.yaml", s)
+	return newEnvoy(s.tec.Ports.ClientAdminPort, confTmpl, baseID, "client.yaml", s)
 }
 
 // NewServerEnvoy creates a new Server Envoy struct and starts envoy.
 func (s *TestSetup) NewServerEnvoy() (*Envoy, error) {
 	confTmpl := envoyServerConfTemplYAML
-	if s.tc.ServerEnvoyTemplate != "" {
-		confTmpl = s.tc.ServerEnvoyTemplate
+	if s.tec.ServerEnvoyTemplate != "" {
+		confTmpl = s.tec.ServerEnvoyTemplate
 	}
 	baseID := strconv.Itoa(int(s.testName+1) * 2)
 
-	return newEnvoy(s.ports.ServerAdminPort, confTmpl, baseID, "server.yaml", s)
+	return newEnvoy(s.tec.Ports.ServerAdminPort, confTmpl, baseID, "server.yaml", s)
 }
 
 // Start starts the envoy process
@@ -111,26 +110,6 @@ func copyYamlFiles(src, dst string) {
 	}
 }
 
-func copyFile(src, dst string) error {
-    in, err := os.Open(src)
-    if err != nil {
-        return err
-    }
-    defer in.Close()
-
-    out, err := os.Create(dst)
-    if err != nil {
-        return err
-    }
-    defer out.Close()
-
-    _, err = io.Copy(out, in)
-    if err != nil {
-        return err
-    }
-    return out.Close()
-}
-
 func downloadEnvoy(ver string) (string, error) {
 	proxyDepUrl := fmt.Sprintf("https://raw.githubusercontent.com/istio/istio/%v/istio.deps", ver)
 	resp, err := http.Get(proxyDepUrl)
@@ -147,8 +126,8 @@ func downloadEnvoy(ver string) (string, error) {
 	json.Unmarshal([]byte(istioDeps), &deps)
 	proxySHA := ""
 	for _, d := range deps {
-		if dm, ok := d.(map[string]string); ok && dm["repoName"] == "proxy" {
-			proxySHA = dm["lastStableSHA"]
+		if dm, ok := d.(map[string]interface{}); ok && dm["repoName"].(string) == "proxy" {
+			proxySHA = dm["lastStableSHA"].(string)
 		}
 	}
 
@@ -157,19 +136,27 @@ func downloadEnvoy(ver string) (string, error) {
 	  return dst, nil
 	}
 	envoyURL := fmt.Sprintf("https://storage.googleapis.com/istio-build/proxy/envoy-alpha-%v.tar.gz", proxySHA)
-	donwloadCmd := exec.Command(fmt.Sprintf("curl -fLSs %v | tar xz", envoyURL))
+	donwloadCmd := exec.Command("bash", "-c", fmt.Sprintf("curl -fLSs %v | tar xz", envoyURL))
 	donwloadCmd.Stderr = os.Stderr
 	donwloadCmd.Stdout = os.Stdout
-	err = donwloadCmd.Start()
+	err = donwloadCmd.Run()
 	if err != nil {
 		return "", fmt.Errorf("fail to run envoy download command: %v", err)
 	}
-	src := "usr/local/envoy"
+	src := "usr/local/bin/envoy"
 	if _, err := os.Stat(src); err != nil {
         return "", fmt.Errorf("fail to find downloaded envoy: %v", err)
 	}
 	defer os.RemoveAll("usr/")
-	copyFile(src, dst)
+
+	mkdirCmd := exec.Command("mkdir", "istio-proxy")
+	if err := mkdirCmd.Run(); err != nil {
+		return "", fmt.Errorf("fail to create directory for %v: %v", dst, err)
+	}
+	cpCmd := exec.Command("cp", src, dst)
+	if err := cpCmd.Run(); err != nil {
+		return "", fmt.Errorf("fail to copy envoy binary from %v to %v: %v", src, dst, err)
+	}
 	
 	return dst, nil
 }
@@ -213,8 +200,8 @@ func newEnvoy(port uint16, confTmpl, baseID, yamlName string, s *TestSetup) (*En
 			"--parent-shutdown-time-s", "1",
 			"--restart-epoch", strconv.Itoa(s.epoch))
 	}
-	if s.tc.EnvoyParams != nil {
-		args = append(args, s.tc.EnvoyParams...)
+	if s.tec.EnvoyParams != nil {
+		args = append(args, s.tec.EnvoyParams...)
 	}
 
 	// Download the test envoy binary. Right now only download one version
@@ -231,7 +218,7 @@ func newEnvoy(port uint16, confTmpl, baseID, yamlName string, s *TestSetup) (*En
 	}
 	return &Envoy{
 		cmd:    cmd,
-		ports:  s.ports,
+		Ports:  s.tec.Ports,
 		baseID: baseID,
 	}, nil
 }

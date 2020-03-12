@@ -1,4 +1,4 @@
-module istio/test/framework
+module github.com/bianpengyuan/istio-wasm-sdk
 
 go 1.13
 
