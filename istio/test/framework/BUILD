@@ -8,7 +8,7 @@ go_library(
         "framework.go",
         "http_client.go",
         "http_server.go",
-        "Ports.go",
+        "ports.go",
         "setup.go",
         "tcp_envoy_conf.go",
         "tcp_server.go",
@@ -17,6 +17,7 @@ go_library(
     importpath = "istio/test/framework/istio/test/framework",
     visibility = ["//visibility:public"],
     deps = [
+        "@com_github_bianpengyuan_istio_wasm_sdk//istio/test/testdata:go_default_library",
         "@com_github_prometheus_client_model//go:go_default_library",
         "@com_github_prometheus_common//expfmt:go_default_library",
     ],
