@@ -24,6 +24,13 @@ namespace Extension {
 
 class ExtensionRootContext : public RootContext {
 public:
+  ExtensionRootContext(uint32_t id, StringView root_id)
+      : RootContext(id, root_id) {
+    LOG_INFO("initialize root context");
+    node_info_ = std::make_unique<NodeInfo::NodeInfo>();
+  }
+  ~ExtensionRootContext() = default;
+
   // Gets peer node info. It checks the node info cache first, and then try to
   // fetch it from host if cache miss. If cache is disabled, it will fetch from
   // host directly.
@@ -33,15 +40,14 @@ public:
   const istio::extension::NodeInfo &getLocalNodeInfo();
 
 private:
-  NodeInfo::NodeInfo node_info_;
+  std::unique_ptr<NodeInfo::NodeInfo> node_info_;
 };
 
 class ExtensionStreamContext : public Context, public StreamInfo::StreamInfo {
 public:
-  ExtensionStreamContext(uint32_t id, RootContext *root);
-  ~ExtensionStreamContext();
+  ExtensionStreamContext(uint32_t id, RootContext *root) : Context(id, root) {};
+  ~ExtensionStreamContext() = default;
 
-protected:
   /************************
        Node Property
   ************************/
@@ -98,7 +104,7 @@ protected:
 
 private:
   ExtensionRootContext *getRootContext() {
-    RootContext *root = this->root();
+    auto *root = this->root();
     return dynamic_cast<ExtensionRootContext *>(root);
   }
 
@@ -108,3 +114,4 @@ private:
 
 } // namespace Extension
 } // namespace Istio
+

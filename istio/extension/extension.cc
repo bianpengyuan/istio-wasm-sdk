@@ -98,7 +98,7 @@ void getDestinationService(StringView dest_namespace, bool use_host_header,
   std::string cluster_name;
   getValue({"cluster_name"}, &cluster_name);
   *dest_svc_host = use_host_header
-                       ? getHeaderMapValue(WasmHeaderMapType::RequestHeaders,
+                       ? getHeaderMapValue(HeaderMapType::RequestHeaders,
                                            kAuthorityHeaderKey)
                              ->toString()
                        : "unknown";
@@ -135,18 +135,15 @@ StringView AuthenticationPolicyString(ServiceAuthenticationPolicy policy) {
 
 const istio::extension::NodeInfo &
 ExtensionRootContext::getPeerNodeInfo(bool is_outbound) {
-  return node_info_.getPeerNodeInfo(is_outbound);
+  return node_info_->getPeerNodeInfo(is_outbound);
 }
 
 const istio::extension::NodeInfo &ExtensionRootContext::getLocalNodeInfo() {
-  return node_info_.getLocalNodeInfo();
+  return node_info_->getLocalNodeInfo();
 }
 
-ExtensionStreamContext::ExtensionStreamContext(uint32_t id, RootContext *root)
-    : Context(id, root) {}
-
 const istio::extension::NodeInfo &ExtensionStreamContext::getSourceNodeInfo() {
-  auto root = getRootContext();
+  auto *root = getRootContext();
   bool is_outbound = isOutbound();
   return is_outbound ? root->getLocalNodeInfo()
                      : root->getPeerNodeInfo(/*is_outbound = */ false);
@@ -154,7 +151,7 @@ const istio::extension::NodeInfo &ExtensionStreamContext::getSourceNodeInfo() {
 
 const istio::extension::NodeInfo &
 ExtensionStreamContext::getDestinationNodeInfo() {
-  auto root = getRootContext();
+  auto *root = getRootContext();
   bool is_outbound = isOutbound();
   return is_outbound ? root->getPeerNodeInfo(/*is_outbound = */ true)
                      : root->getLocalNodeInfo();
@@ -268,7 +265,7 @@ const std::string &ExtensionStreamContext::requestProtocol() {
   if (!stream_info_.has_request_protocol()) {
     // TODO Add http/1.1, http/1.0, http/2 in a separate attribute.
     // http|grpc classification is compatible with Mixerclient
-    if (kGrpcContentTypes.count(getHeaderMapValue(WasmHeaderMapType::RequestHeaders,
+    if (kGrpcContentTypes.count(getHeaderMapValue(HeaderMapType::RequestHeaders,
                                                   kContentTypeHeaderKey)
                                     ->toString()) != 0) {
       stream_info_.mutable_request_protocol()->set_value(kProtocolGRPC);

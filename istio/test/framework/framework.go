@@ -44,7 +44,7 @@ func NewTest(config TestEnvoyConfig, t *testing.T) *Test {
 	}
 }
 
-func (t *Test) Run(fn func()) {
+func (t *Test) Run(fn func(ports *Ports)) {
 	// Alloc testing ports
 	var err error
 	t.tec.Ports, err = pa.AllocatePorts()
@@ -73,5 +73,5 @@ func (t *Test) Run(fn func()) {
 	}
 	defer ts.TearDownClientServerEnvoy()
 	// Start test
-	fn()
+	fn(t.tec.Ports)
 }

@@ -43,6 +43,7 @@ static_resources:
                 port_value: {{.Ports.ClientToServerProxyPort}}
 {{.UpstreamFiltersInClient | indent 4 }}    
 {{.ClusterTLSContext | indent 4 }}
+{{.ClientEnvoyExtraCluster | indent 2 }}
   listeners:
   - name: app-to-client
     traffic_direction: OUTBOUND
@@ -98,6 +99,7 @@ static_resources:
                 address: 127.0.0.1
                 port_value: {{.Ports.BackendPort}}
 {{.ServerClusterTLSContext | indent 4 }}
+{{.ServerEnvoyExtraCluster | indent 2 }}
   listeners:
   - name: server
     traffic_direction: INBOUND

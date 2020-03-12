@@ -32,9 +32,10 @@ def sdk_dependencies():
 
     new_git_repository(
         name = "proxy_wasm_cpp_sdk",
-        remote = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk",
-        commit = "31f1fc5b7e09f231fa532d2d296e479a113c3e10",
+        remote = "https://github.com/istio/envoy",
+        commit = "ec96b58244665969eb3a4d5ca34b07b022360749",
         workspace_file_content = 'workspace(name = "proxy_wasm_cpp_sdk")',
+        strip_prefix = "api/wasm/cpp",
         patch_cmds = ["rm BUILD"],
         build_file = "@istio_wasm_sdk//bazel/external:proxy-wasm-cpp-sdk.BUILD",
     )

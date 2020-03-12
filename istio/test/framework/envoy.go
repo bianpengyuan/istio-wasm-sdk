@@ -131,7 +131,7 @@ func downloadEnvoy(ver string) (string, error) {
 		}
 	}
 
-	dst := fmt.Sprintf("istio-proxy/envoy-%v", proxySHA)
+	dst := fmt.Sprintf("%v/envoy-%v", GetDefaultIstioOut(), proxySHA)
 	if _, err := os.Stat(dst); err == nil {
 	  return dst, nil
 	}
@@ -149,10 +149,6 @@ func downloadEnvoy(ver string) (string, error) {
 	}
 	defer os.RemoveAll("usr/")
 
-	mkdirCmd := exec.Command("mkdir", "istio-proxy")
-	if err := mkdirCmd.Run(); err != nil {
-		return "", fmt.Errorf("fail to create directory for %v: %v", dst, err)
-	}
 	cpCmd := exec.Command("cp", src, dst)
 	if err := cpCmd.Run(); err != nil {
 		return "", fmt.Errorf("fail to copy envoy binary from %v to %v: %v", src, dst, err)

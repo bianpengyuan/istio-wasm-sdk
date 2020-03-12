@@ -49,6 +49,14 @@ type TestEnvoyConfig struct {
 	// ProxyToServer listener.
 	FiltersBeforeEnvoyRouterInProxyToServer string
 
+	/*
+	*  Static Cluster
+	*/
+	// Extra static cluster in server side envoy proxy in addition of server app cluster.
+	ServerEnvoyExtraCluster string
+	// Extra static cluster in client side envoy proxy in addition of server proxy cluster.
+	ClientEnvoyExtraCluster string
+
 	/* 
 	*   Node metadata
 	*/
@@ -82,6 +90,7 @@ type TestEnvoyConfig struct {
 	ServerTLSContext string
 	// ServerClusterTLSContext to be used.
 	ServerClusterTLSContext string
+	ClientClusterTLSContext string
 	// UpstreamFilters chain in client.
 	UpstreamFiltersInClient string
 

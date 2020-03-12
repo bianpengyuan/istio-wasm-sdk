@@ -48,8 +48,9 @@ static_resources:
               socket_address:
                 address: 127.0.0.1
                 port_value: {{.Ports.ClientToServerProxyPort}}
+{{.ClientClusterTLSContext | indent 4 }}
 {{.UpstreamFiltersInClient | indent 4 }}  
-{{.ClusterTLSContext | indent 4 }}
+{{.ClientEnvoyExtraCluster | indent 2 }}
   listeners:
   - name: app-to-client
     traffic_direction: OUTBOUND
@@ -109,7 +110,8 @@ static_resources:
               socket_address:
                 address: 127.0.0.1
                 port_value: {{.Ports.BackendPort}}
-{{.ClusterTLSContext | indent 4 }}
+{{.ServerClusterTLSContext | indent 4 }}
+{{.ServerEnvoyExtraCluster | indent 2 }}
   listeners:
   - name: proxy-to-backend
     traffic_direction: INBOUND
@@ -142,7 +144,7 @@ static_resources:
                 route:
                   cluster: inbound|9080|http|server.default.svc.cluster.local
                   timeout: 0s
-{{.TLSContext | indent 6 }}`
+{{.ServerTLSContext | indent 6 }}`
 
 // CreateEnvoyConf create envoy config.
 func (s *TestSetup) CreateEnvoyConf(path, confTmpl string) error {
