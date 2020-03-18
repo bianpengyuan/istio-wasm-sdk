@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -102,11 +103,9 @@ func (s *HTTPServer) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// echo back the Content-Type and Content-Length in the response
-	for _, k := range []string{"Content-Type", "Content-Length"} {
-		if v := r.Header.Get(k); v != "" {
-			w.Header().Set(k, v)
-		}
+	// echo back all the headers
+	for k, v := range r.Header {
+		w.Header().Set(k, strings.Join(v, ","))
 	}
 
 	if delay := r.URL.Query().Get("delay"); delay != "" {

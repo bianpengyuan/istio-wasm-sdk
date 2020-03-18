@@ -15,16 +15,16 @@
 package framework
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"time"
-	"encoding/json"
-	"net/http"
-	"io/ioutil"
 )
 
 // Envoy stores data for Envoy process
@@ -133,7 +133,7 @@ func downloadEnvoy(ver string) (string, error) {
 
 	dst := fmt.Sprintf("%v/envoy-%v", GetDefaultIstioOut(), proxySHA)
 	if _, err := os.Stat(dst); err == nil {
-	  return dst, nil
+		return dst, nil
 	}
 	envoyURL := fmt.Sprintf("https://storage.googleapis.com/istio-build/proxy/envoy-alpha-%v.tar.gz", proxySHA)
 	donwloadCmd := exec.Command("bash", "-c", fmt.Sprintf("curl -fLSs %v | tar xz", envoyURL))
@@ -145,7 +145,7 @@ func downloadEnvoy(ver string) (string, error) {
 	}
 	src := "usr/local/bin/envoy"
 	if _, err := os.Stat(src); err != nil {
-        return "", fmt.Errorf("fail to find downloaded envoy: %v", err)
+		return "", fmt.Errorf("fail to find downloaded envoy: %v", err)
 	}
 	defer os.RemoveAll("usr/")
 
@@ -153,7 +153,7 @@ func downloadEnvoy(ver string) (string, error) {
 	if err := cpCmd.Run(); err != nil {
 		return "", fmt.Errorf("fail to copy envoy binary from %v to %v: %v", src, dst, err)
 	}
-	
+
 	return dst, nil
 }
 

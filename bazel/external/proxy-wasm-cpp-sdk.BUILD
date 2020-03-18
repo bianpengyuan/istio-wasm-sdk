@@ -4,8 +4,6 @@ cc_library(
     name = "proxy_wasm_intrinsics",
     srcs = [
         "proxy_wasm_intrinsics.cc",
-        "proxy_wasm_intrinsics_lite.pb.cc",
-        "struct_lite.pb.cc",
     ],
     hdrs = [
         "proxy_wasm_api.h",
@@ -13,13 +11,27 @@ cc_library(
         "proxy_wasm_enums.h",
         "proxy_wasm_externs.h",
         "proxy_wasm_intrinsics.h",
-        "proxy_wasm_intrinsics.pb.h",
-        "proxy_wasm_intrinsics_lite.pb.h",
-        "struct_lite.pb.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_google_protobuf//:protobuf_lite",
+        ":proxy_wasm_intrinsics_cc_proto",
+        "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cc_proto_library(
+    name = "proxy_wasm_intrinsics_cc_proto",
+    deps = [":proxy_wasm_intrinsics_proto"],
+)
+
+proto_library(
+    name = "proxy_wasm_intrinsics_proto",
+    srcs = ["proxy_wasm_intrinsics.proto"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+        "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:struct_proto",
+        "@com_google_protobuf//:empty_proto",
     ],
 )
 

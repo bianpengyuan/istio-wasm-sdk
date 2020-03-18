@@ -36,9 +36,9 @@ type TestEnvoyConfig struct {
 	// ServerEnvoyTemplate is the bootstrap config used by server envoy.
 	ServerEnvoyTemplate string
 
-	/* 
+	/*
 	*   Filters config
-	*/
+	 */
 	// FiltersBeforeEnvoyRouterInAppToClient are the filters that come before envoy.router http filter in AppToClient
 	// listener.
 	FiltersBeforeEnvoyRouterInAppToClient string
@@ -51,23 +51,23 @@ type TestEnvoyConfig struct {
 
 	/*
 	*  Static Cluster
-	*/
+	 */
 	// Extra static cluster in server side envoy proxy in addition of server app cluster.
 	ServerEnvoyExtraCluster string
 	// Extra static cluster in client side envoy proxy in addition of server proxy cluster.
 	ClientEnvoyExtraCluster string
 
-	/* 
+	/*
 	*   Node metadata
-	*/
+	 */
 	// Server side Envoy node metadata.
 	ServerNodeMetadata string
 	// Client side Envoy node metadata.
 	ClientNodeMetadata string
 
-	/* 
+	/*
 	*   Access log configuration
-	*/
+	 */
 	// AccessLogPath is the access log path for Envoy
 	AccessLogPath string
 	// AccessLogPath is the access log path for the client Envoy
@@ -79,9 +79,9 @@ type TestEnvoyConfig struct {
 	// Format for server accesslog
 	ServerAccesslogFormat string
 
-	/* 
+	/*
 	*   TLS configuration
-	*/
+	 */
 	// TLSContext to be used.
 	TLSContext string
 	// ClusterTLSContext to be used.
@@ -94,14 +94,14 @@ type TestEnvoyConfig struct {
 	// UpstreamFilters chain in client.
 	UpstreamFiltersInClient string
 
-	/* 
+	/*
 	*   Extra top level configuration
-	*/
+	 */
 	// ExtraConfig that needs to be passed to envoy. Ex stats_config.
 	ExtraConfig string
 
 	// Allocated Ports for Envoy process.
-	Ports       *Ports
+	Ports *Ports
 }
 
 // TestSetup store data for a test.
@@ -126,9 +126,9 @@ type TestSetup struct {
 	startHTTPBackend  bool
 	disableHotRestart bool
 
-	startTCPBackend   bool
-	copyYamlFiles     bool
-	EnableTLS         bool
+	startTCPBackend bool
+	copyYamlFiles   bool
+	EnableTLS       bool
 }
 
 // Stat represents a prometheus stat with labels.
@@ -273,7 +273,7 @@ func (s *TestSetup) LastRequestHeaders() http.Header {
 func (s *TestSetup) WaitForStatsUpdateAndGetStats(waitDuration int, port uint16) (string, error) {
 	time.Sleep(time.Duration(waitDuration) * time.Second)
 	statsURL := fmt.Sprintf("http://localhost:%d/stats?format=json&usedonly", port)
-	code, respBody, err := HTTPGet(statsURL)
+	code, _, respBody, err := HTTPGet(statsURL, map[string][]string{})
 	if err != nil {
 		return "", fmt.Errorf("sending stats request returns an error: %v", err)
 	}
@@ -303,7 +303,7 @@ func (s *TestSetup) WaitEnvoyReady(port uint16) {
 	var stats map[string]int
 	for attempt := 0; attempt < int(total/delay); attempt++ {
 		statsURL := fmt.Sprintf("http://localhost:%d/stats?format=json&usedonly", port)
-		code, respBody, errGet := HTTPGet(statsURL)
+		code, _, respBody, errGet := HTTPGet(statsURL, map[string][]string{})
 		if errGet == nil && code == 200 {
 			stats = s.unmarshalStats(respBody)
 			warmingListeners, hasListeners := stats["listener_manager.total_listeners_warming"]
@@ -370,7 +370,7 @@ func (s *TestSetup) VerifyEnvoyStats(expectedStats map[string]int, port uint16) 
 	var err error
 	for attempt := 0; attempt < int(total/delay); attempt++ {
 		statsURL := fmt.Sprintf("http://localhost:%d/stats?format=json&usedonly", port)
-		code, respBody, errGet := HTTPGet(statsURL)
+		code, _, respBody, errGet := HTTPGet(statsURL, map[string][]string{})
 		if errGet != nil {
 			log.Printf("sending stats request returns an error: %v", errGet)
 		} else if code != 200 {
@@ -452,7 +452,7 @@ func (s *TestSetup) VerifyPrometheusStats(expectedStats map[string]Stat, port ui
 	var err error
 	for attempt := 0; attempt < int(total/delay); attempt++ {
 		statsURL := fmt.Sprintf("http://localhost:%d/stats/prometheus", port)
-		code, respBody, errGet := HTTPGet(statsURL)
+		code, _, respBody, errGet := HTTPGet(statsURL, map[string][]string{})
 		if errGet != nil {
 			log.Printf("sending stats request returns an error: %v", errGet)
 		} else if code != 200 {

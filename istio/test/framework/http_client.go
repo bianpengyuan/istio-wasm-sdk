@@ -37,26 +37,31 @@ const (
 )
 
 // HTTPGet send GET
-func HTTPGet(url string) (code int, respBody string, err error) {
+func HTTPGet(url string, reqHeader map[string][]string) (code int, responseHeader map[string][]string, respBody string, err error) {
 	log.Println("HTTP GET", url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatal("Error reading request. ", err)
+	}
+	req.Header = reqHeader
 	client := &http.Client{Timeout: httpTimeOut}
-	resp, err := client.Get(url)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
-		return 0, "", err
+		return 0, map[string][]string{}, "", err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
-		return 0, "", err
+		return 0, map[string][]string{}, "", err
 	}
 	respBody = string(body)
 	code = resp.StatusCode
-	return code, respBody, nil
+	return code, resp.Header, respBody, nil
 }
 
-// HTTPGet send GET
+// HTTPTlsGet send GET
 func HTTPTlsGet(url, rootdir string, port uint16) (code int, respBody string, err error) {
 	certPool := x509.NewCertPool()
 	bs, err := ioutil.ReadFile(filepath.Join(rootdir, "testdata/certs/cert-chain.pem"))
@@ -192,7 +197,7 @@ func WaitForHTTPServerWithTLS(url, rootDir string, enableTLS bool, port uint16) 
 		if enableTLS {
 			code, _, err = HTTPTlsGet(url, rootDir, port)
 		} else {
-			code, _, err = HTTPGet(url)
+			code, _, _, err = HTTPGet(url, map[string][]string{})
 		}
 		if err == nil && code == http.StatusOK {
 			log.Println("Server is up and running...")
