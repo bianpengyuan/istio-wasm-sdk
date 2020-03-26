@@ -201,7 +201,7 @@ func newEnvoy(port uint16, confTmpl, baseID, yamlName string, s *TestSetup) (*En
 	}
 
 	// Download the test envoy binary. Right now only download one version
-	envoyPath, err := downloadEnvoy("release-1.5")
+	envoyPath, err := downloadEnvoy("master")
 	if err != nil {
 		return nil, err
 	}

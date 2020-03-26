@@ -31,3 +31,11 @@ cc_library(
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )
+
+cc_library(
+    name = "base64",
+    hdrs = [
+        "base64.h",
+    ],
+    visibility = ["//visibility:public"],
+)
