@@ -26,7 +26,6 @@ class ExtensionRootContext : public RootContext {
 public:
   ExtensionRootContext(uint32_t id, StringView root_id)
       : RootContext(id, root_id) {
-    LOG_INFO("initialize root context");
     node_info_ = std::make_unique<NodeInfo::NodeInfo>();
   }
   ~ExtensionRootContext() = default;
