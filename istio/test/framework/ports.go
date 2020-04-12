@@ -74,8 +74,8 @@ func (p *PortAllocator) AllocatePorts() (*Ports, error) {
 	}, nil
 }
 
-func allPortFree(base uint16, Ports uint16) bool {
-	for port := base; port < base+Ports; port++ {
+func allPortFree(base uint16, ports uint16) bool {
+	for port := base; port < base+ports; port++ {
 		if IsPortUsed(port) {
 			log.Println("port is used ", port)
 			return false

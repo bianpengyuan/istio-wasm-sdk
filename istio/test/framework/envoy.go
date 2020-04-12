@@ -83,7 +83,7 @@ func (e *Envoy) Run(p *Params) error {
 		"--disable-hot-restart",
 		"--drain-time-s", "4", // this affects how long draining listenrs are kept alive
 	}
-	e.branch = "master"
+	e.branch = "05421a8164208ac87885b4ceda4ae6b6755ea7fc"
 	if version, exists := os.LookupEnv("ENVOY_VERSION"); exists {
 		e.branch = version
 	}
@@ -241,6 +241,7 @@ func (c *ClientEnvoy) Run(p *Params) error {
 	if err := c.e.Run(p); err != nil {
 		return err
 	}
+	time.Sleep(3 * time.Second)
 	return nil
 }
 
@@ -282,6 +283,7 @@ func (s *ServerEnvoy) Run(p *Params) error {
 	if err = <-errCh; err != nil {
 		return fmt.Errorf("backend server start failed %v", err)
 	}
+	time.Sleep(3 * time.Second)
 	return nil
 }
 

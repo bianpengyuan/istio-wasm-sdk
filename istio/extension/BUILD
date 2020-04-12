@@ -26,7 +26,5 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//istio/extension/node_info",
-        "//istio/extension/stream_info",
-        "//istio/extension/stream_info:stream_info_cc_proto",
     ],
 )

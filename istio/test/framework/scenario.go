@@ -52,6 +52,12 @@ type (
 	Sleep struct {
 		time.Duration
 	}
+	UpdateParamsVars struct {
+		Vars map[string]string
+	}
+	ReloadParamsVars struct {
+		Vars map[string]string
+	}
 	// Fork will copy params to avoid concurrent access
 	Fork struct {
 		Fore Step
@@ -110,13 +116,15 @@ func (s *Sleep) Run(_ *Params) error {
 func (s *Sleep) Cleanup() {}
 
 func (p *Params) Fill(s string) (string, error) {
-	fmt.Println(s)
 	t := template.Must(template.New("params").
 		Option("missingkey=zero").
 		Funcs(template.FuncMap{
 			"indent": func(n int, s string) string {
 				pad := strings.Repeat(" ", n)
 				return pad + strings.Replace(s, "\n", "\n"+pad, -1)
+			},
+			"increment": func(p uint16, inc uint16) uint16 {
+				return p + inc
 			},
 		}).
 		Parse(s))
@@ -181,3 +189,25 @@ func (p *Params) FillYAML(input string, pb proto.Message) error {
 	}
 	return ReadYAML(out, pb)
 }
+
+var _ Step = &UpdateParamsVars{}
+
+func (u *UpdateParamsVars) Run(p *Params) error {
+	for k, v := range u.Vars {
+		p.Vars[k] = v
+	}
+	return nil
+}
+
+func (u *UpdateParamsVars) Cleanup() {}
+
+var _ Step = &ReloadParamsVars{}
+
+func (u *ReloadParamsVars) Run(p *Params) error {
+	for k, v := range u.Vars {
+		p.Vars[k] = p.LoadTestData(v)
+	}
+	return nil
+}
+
+func (u *ReloadParamsVars) Cleanup() {}

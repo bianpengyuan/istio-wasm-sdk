@@ -43,6 +43,7 @@ filter_chains:
                 code:
                   local:
                     inline_string: envoy.wasm.metadata_exchange
+              configuration: "{ max_peer_cache_size: 20 }"
 {{- if ne .Vars.ClientHTTPFilters "" }}
 {{ .Vars.ClientHTTPFilters | indent 6 }}
 {{- end }}
@@ -88,6 +89,7 @@ filter_chains:
                 code:
                   local:
                     inline_string: envoy.wasm.metadata_exchange
+              configuration: "{ max_peer_cache_size: 20 }"
 {{- if ne .Vars.ServerHTTPFilters "" }}
 {{ .Vars.ServerHTTPFilters | indent 6 }}
 {{- end }}

@@ -16,8 +16,7 @@
 #pragma once
 
 #include "istio/extension/node_info/node_info.h"
-#include "istio/extension/stream_info/stream_info.h"
-#include "istio/extension/stream_info/stream_info.pb.h"
+#include "istio/extension/util/util.h"
 
 namespace Istio {
 namespace Extension {
@@ -42,64 +41,41 @@ private:
   std::unique_ptr<NodeInfo::NodeInfo> node_info_;
 };
 
-class ExtensionStreamContext : public Context, public StreamInfo::StreamInfo {
+class ExtensionStreamContext : public Context {
 public:
-  ExtensionStreamContext(uint32_t id, RootContext *root) : Context(id, root) {};
+  ExtensionStreamContext(uint32_t id, RootContext *root) : Context(id, root){};
   ~ExtensionStreamContext() = default;
 
   /************************
-       Node Property
+        Node Property
   ************************/
-  const istio::extension::NodeInfo &getSourceNodeInfo();
-  const istio::extension::NodeInfo &getDestinationNodeInfo();
+  // TODO: labels and platform metadata
+  const std::string &sourceName();
+  const std::string &sourceNamespace();
+  const std::string &sourceOwner();
+  const std::string &sourceWorkloadName();
+  const std::string &sourceIstioVersion();
+  const std::string &sourceMeshID();
+
+  const std::string &destinationName();
+  const std::string &destinationNamespace();
+  const std::string &destinationOwner();
+  const std::string &destinationWorkloadName();
+  const std::string &destinationIstioVersion();
+  const std::string &destinationMeshID();
 
   /************************
       Request Property
   ************************/
+  bool isOutbound();
+  int64_t destinationPort();
+  const std::string responseFlag();
+  const std::string &requestProtocol();
+  ServiceAuthenticationPolicy serviceAuthenticationPolicy();
+  const std::string& sourcePrincipal();
+  const std::string& destinationPrincipal();
 
-  // Time
-  int64_t requestTimestamp() override;
-  int64_t responseTimestamp() override;
-  int64_t duration() override;
-  int64_t responseDuration() override;
-
-  // Size
-  int64_t requestSize() override;
-  int64_t responseSize() override;
-
-  // Connection
-  const std::string &sourceAddress() override;
-  const std::string &destinationAddress() override;
-  int64_t destinationPort() override;
-  const std::string &responseFlag() override;
-
-  // HTTP
-  const std::string &requestProtocol() override;
-  int64_t responseCode() override;
-  const std::string &destinationServiceName() override;
-  const std::string &destinationServiceHost() override;
-  const std::string &requestOperation() override;
-  const std::string &urlPath() override;
-  const std::string &requestHost() override;
-  const std::string &requestScheme() override;
-
-  // Auth
-  ::Istio::Extension::StreamInfo::ServiceAuthenticationPolicy
-  serviceAuthenticationPolicy() override;
-  const std::string &sourcePrincipal() override;
-  const std::string &destinationPrincipal() override;
-  const std::string &requestedServerName() override;
-
-  // Direction
-  bool isOutbound() override;
-
-  // Header
-  const std::string &referer() override;
-  const std::string &userAgent() override;
-  const std::string &requestID() override;
-  const std::string &b3TraceID() override;
-  const std::string &b3SpanID() override;
-  bool b3TraceSampled() override;
+  void destinationService(std::string *dest_host, std::string *dest_name);
 
 private:
   ExtensionRootContext *getRootContext() {
@@ -107,10 +83,12 @@ private:
     return dynamic_cast<ExtensionRootContext *>(root);
   }
 
-  ::istio::extension::StreamInfo stream_info_;
-  bool use_traffic_data_ = true;
+  const istio::extension::NodeInfo &sourceNodeInfo();
+  const istio::extension::NodeInfo &destinationNodeInfo();
+
+  std::string source_principal_;
+  std::string destination_principal_;
 };
 
 } // namespace Extension
 } // namespace Istio
-

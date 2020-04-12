@@ -25,6 +25,12 @@ enum class TrafficDirection : int64_t {
   Outbound = 2,
 };
 
+enum class ServiceAuthenticationPolicy : int64_t {
+  Unspecified = 0,
+  None = 1,
+  MutualTLS = 2,
+};
+
 namespace Util {
 
 // Retrieves the traffic direction from the configuration context.
@@ -32,6 +38,9 @@ TrafficDirection getTrafficDirection();
 
 // Parses an integer response flag into a readable short string.
 const std::string parseResponseFlag(uint64_t response_flag);
+
+const std::string &
+authenticationPolicyString(ServiceAuthenticationPolicy policy);
 
 } // namespace Util
 } // namespace Extension

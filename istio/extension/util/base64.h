@@ -25,10 +25,10 @@ namespace Extension {
 namespace Util {
 
 class Base64 {
- public:
-  static std::string encode(const char* input, uint64_t length,
+public:
+  static std::string encode(const char *input, uint64_t length,
                             bool add_padding);
-  static std::string encode(const char* input, uint64_t length) {
+  static std::string encode(const char *input, uint64_t length) {
     return encode(input, length, true);
   }
   static std::string decodeWithoutPadding(std::string_view input);
@@ -52,8 +52,8 @@ inline constexpr unsigned char REVERSE_LOOKUP_TABLE[256] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 // clang-format on
 
-inline bool decodeBase(const uint8_t cur_char, uint64_t pos, std::string& ret,
-                       const unsigned char* const reverse_lookup_table) {
+inline bool decodeBase(const uint8_t cur_char, uint64_t pos, std::string &ret,
+                       const unsigned char *const reverse_lookup_table) {
   const unsigned char c = reverse_lookup_table[static_cast<uint32_t>(cur_char)];
   if (c == 64) {
     // Invalid character
@@ -61,26 +61,26 @@ inline bool decodeBase(const uint8_t cur_char, uint64_t pos, std::string& ret,
   }
 
   switch (pos % 4) {
-    case 0:
-      ret.push_back(c << 2);
-      break;
-    case 1:
-      ret.back() |= c >> 4;
-      ret.push_back(c << 4);
-      break;
-    case 2:
-      ret.back() |= c >> 2;
-      ret.push_back(c << 6);
-      break;
-    case 3:
-      ret.back() |= c;
-      break;
+  case 0:
+    ret.push_back(c << 2);
+    break;
+  case 1:
+    ret.back() |= c >> 4;
+    ret.push_back(c << 4);
+    break;
+  case 2:
+    ret.back() |= c >> 2;
+    ret.push_back(c << 6);
+    break;
+  case 3:
+    ret.back() |= c;
+    break;
   }
   return true;
 }
 
-inline bool decodeLast(const uint8_t cur_char, uint64_t pos, std::string& ret,
-                       const unsigned char* const reverse_lookup_table) {
+inline bool decodeLast(const uint8_t cur_char, uint64_t pos, std::string &ret,
+                       const unsigned char *const reverse_lookup_table) {
   const unsigned char c = reverse_lookup_table[static_cast<uint32_t>(cur_char)];
   if (c == 64) {
     // Invalid character
@@ -88,62 +88,62 @@ inline bool decodeLast(const uint8_t cur_char, uint64_t pos, std::string& ret,
   }
 
   switch (pos % 4) {
-    case 0:
-      return false;
-    case 1:
-      ret.back() |= c >> 4;
-      return (c & 0b1111) == 0;
-    case 2:
-      ret.back() |= c >> 2;
-      return (c & 0b11) == 0;
-    case 3:
-      ret.back() |= c;
-      break;
+  case 0:
+    return false;
+  case 1:
+    ret.back() |= c >> 4;
+    return (c & 0b1111) == 0;
+  case 2:
+    ret.back() |= c >> 2;
+    return (c & 0b11) == 0;
+  case 3:
+    ret.back() |= c;
+    break;
   }
   return true;
 }
 
-inline void encodeBase(const uint8_t cur_char, uint64_t pos, uint8_t& next_c,
-                       std::string& ret, const char* const char_table) {
+inline void encodeBase(const uint8_t cur_char, uint64_t pos, uint8_t &next_c,
+                       std::string &ret, const char *const char_table) {
   switch (pos % 3) {
-    case 0:
-      ret.push_back(char_table[cur_char >> 2]);
-      next_c = (cur_char & 0x03) << 4;
-      break;
-    case 1:
-      ret.push_back(char_table[next_c | (cur_char >> 4)]);
-      next_c = (cur_char & 0x0f) << 2;
-      break;
-    case 2:
-      ret.push_back(char_table[next_c | (cur_char >> 6)]);
-      ret.push_back(char_table[cur_char & 0x3f]);
-      next_c = 0;
-      break;
+  case 0:
+    ret.push_back(char_table[cur_char >> 2]);
+    next_c = (cur_char & 0x03) << 4;
+    break;
+  case 1:
+    ret.push_back(char_table[next_c | (cur_char >> 4)]);
+    next_c = (cur_char & 0x0f) << 2;
+    break;
+  case 2:
+    ret.push_back(char_table[next_c | (cur_char >> 6)]);
+    ret.push_back(char_table[cur_char & 0x3f]);
+    next_c = 0;
+    break;
   }
 }
 
-inline void encodeLast(uint64_t pos, uint8_t last_char, std::string& ret,
-                       const char* const char_table, bool add_padding) {
+inline void encodeLast(uint64_t pos, uint8_t last_char, std::string &ret,
+                       const char *const char_table, bool add_padding) {
   switch (pos % 3) {
-    case 1:
-      ret.push_back(char_table[last_char]);
-      if (add_padding) {
-        ret.push_back('=');
-        ret.push_back('=');
-      }
-      break;
-    case 2:
-      ret.push_back(char_table[last_char]);
-      if (add_padding) {
-        ret.push_back('=');
-      }
-      break;
-    default:
-      break;
+  case 1:
+    ret.push_back(char_table[last_char]);
+    if (add_padding) {
+      ret.push_back('=');
+      ret.push_back('=');
+    }
+    break;
+  case 2:
+    ret.push_back(char_table[last_char]);
+    if (add_padding) {
+      ret.push_back('=');
+    }
+    break;
+  default:
+    break;
   }
 }
 
-inline std::string Base64::encode(const char* input, uint64_t length,
+inline std::string Base64::encode(const char *input, uint64_t length,
                                   bool add_padding) {
   uint64_t output_length = (length + 2) / 3 * 4;
   std::string ret;

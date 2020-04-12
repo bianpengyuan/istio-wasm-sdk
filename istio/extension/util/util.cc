@@ -48,6 +48,10 @@ const std::string STREAM_IDLE_TIMEOUT = "SI";
 const std::string INVALID_ENVOY_REQUEST_HEADERS = "IH";
 const std::string DOWNSTREAM_PROTOCOL_ERROR = "DPE";
 
+const std::string MutualTLS = "MUTUAL_TLS";
+const std::string None = "NONE";
+const std::string Unknown = "UNKNOWN";
+
 enum ResponseFlag {
   FailedLocalHealthCheck = 0x1,
   NoHealthyUpstream = 0x2,
@@ -175,6 +179,19 @@ const std::string parseResponseFlag(uint64_t response_flag) {
   }
 
   return result.empty() ? NONE : result;
+}
+
+const std::string &
+authenticationPolicyString(ServiceAuthenticationPolicy policy) {
+  switch (policy) {
+  case ServiceAuthenticationPolicy::None:
+    return None;
+  case ServiceAuthenticationPolicy::MutualTLS:
+    return MutualTLS;
+  default:
+    break;
+  }
+  return Unknown;
 }
 
 } // namespace Util
